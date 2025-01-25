@@ -26,6 +26,7 @@ export default function LostItems() {
             </label>
             <input type="date" id="date" className="w-full p-2 rounded bg-black/20 border border-gray-700 text-white" />
           </div>
+          {/* Put the id=date into the DB */}
 {/* Flight number */}
           <div className="space-y-2">
             <label htmlFor="flight" className="block text-sm text-gray-300">
@@ -37,6 +38,7 @@ export default function LostItems() {
               className="w-full p-2 rounded bg-black/20 border border-gray-700 text-white"
               placeholder="Enter flight number"
             />
+            {/* Put id=flight into the DB */}
           </div>
 {/* Added description */}
           <div className="space-y-2">
@@ -48,6 +50,7 @@ export default function LostItems() {
               className="w-full p-2 rounded bg-black/20 border border-gray-700 text-white h-32"
               placeholder="Please describe the lost item"
             />
+            {/* Put id=description in DB */}
           </div>
 
           <button
