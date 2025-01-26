@@ -5,42 +5,47 @@ import LostItem from '@/models/LostItem';
 import { validateRequest } from '@/lib/middleware';
 import { partialLostItemSchema } from '@/lib/validations/schemas';
 import { uploadImage, deleteImage } from '@/lib/cloudinary';
+import Flight from '@/models/Flight';
+import Seat from '@/models/Seat';
 
 export async function GET(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     await dbConnect();
-    const { id } = await context.params;
-    console.log('Fetching item with id/token:', id);
-    
-    // Try to find item by either ObjectId or claimToken
-    const item = await LostItem.findOne({
-      $or: [
-        // Check if id is a valid ObjectId first
-        { _id: mongoose.isValidObjectId(id) ? id : null },
-        { claimToken: id }
-      ]
-    }).populate('flight').populate('seat');
+    console.log('Fetching item with id:', params.id);
 
-    console.log('Found item:', item);
+    const lostItem = await LostItem.findById(params.id)
+      .populate({
+        path: 'flight',
+        model: Flight,
+        select: 'flightNumber originCode destinationCode departureTime arrivalTime'
+      })
+      .populate({
+        path: 'seat',
+        model: Seat,
+        select: 'seatNumber customerEmail'
+      })
+      .lean();
 
-    if (!item) {
+    if (!lostItem) {
+      console.log('Item not found');
       return NextResponse.json(
-        { error: 'Lost item not found' },
+        { error: 'Item not found' },
         { status: 404 }
       );
     }
 
-    // Return the item data
-    return NextResponse.json({
-      item,
-      status: item.status
-    });
-  } catch (error: any) {
-    console.error('Error fetching item:', error);
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.log('Found item:', lostItem);
+
+    return NextResponse.json(lostItem);
+  } catch (error) {
+    console.error('Error fetching lost item:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch item' },
+      { status: 500 }
+    );
   }
 }
 
