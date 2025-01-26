@@ -5,12 +5,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --color-primary: #3030A0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --color-primary: #4242c6;
+    --color-primary-dark: #2222A6;
+    --color-primary-darker: #020286;
   }
 }
 
@@ -18,4 +22,36 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #FFF;
+
+  &:hover {
+    background: var(--color-primary-dark);
+  }
+
+  &:active {
+    background: var(--color-primary-darker);
+  }
+}
+
+.btn {
+  font-size: inherit;
+  cursor: pointer;
+  transition: background 300ms;
+}
+
+.btn-neutral {
+  background: #DDD;
+  color: #000;
+
+  &:hover {
+    background: #CCC;
+  }
+
+  &:active {
+    background: #BBB;
+  }
 }
