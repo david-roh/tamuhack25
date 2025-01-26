@@ -5,12 +5,20 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --color-primary: #3030A0;
+  --color-primary-dark: #101080;
+  --color-primary-darker: #000060;
+  --color-primary-verylight: #D0D0F0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --color-primary: #4242c6;
+    --color-primary-dark: #2222A6;
+    --color-primary-darker: #020286;
+    --color-primary-verylight: #D0D0F0;
   }
 }
 
@@ -18,4 +26,41 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #FFF;
+
+  &:not(:disabled):hover {
+    background: var(--color-primary-dark);
+  }
+
+  &:not(:disabled):active {
+    background: var(--color-primary-darker);
+  }
+}
+
+.btn {
+  font-size: inherit;
+  cursor: pointer;
+  transition: background 300ms;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-neutral {
+  background: #DDD;
+  color: #000;
+
+  &:not(:disabled):hover {
+    background: #BBB;
+  }
+
+  &:not(:disabled):active {
+    background: #999;
+  }
 }
