@@ -132,7 +132,7 @@ export default function Gallery() {
                 {/* For when user is editing */}
                 <textarea
                   placeholder="Enter Description"
-                  value={item.itemDescription && item.itemDescription}
+                  value={item.itemDescription && item.itemDescription.trim()}
                   onChange={(e) => handleCaptionEdit(item._id, e.target.value)}
                   rows={5} // Adjust the height with the rows attribute
                   className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring focus:ring-blue-500"
