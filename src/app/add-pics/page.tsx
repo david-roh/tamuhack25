@@ -55,16 +55,18 @@ export default function Page() {
           
           try {
             const data = await response.json();
+
+            if (!response.ok) {
+              addBtn.disabled = false;
+              throw new Error(data.error || "Failed to submit item");
+            }
           }
           catch (error) {
+            addBtn.disabled = false;
             throw new Error("Failed to submit item");
           }
 
           addBtn.disabled = false;
-    
-          if (!response.ok) {
-            throw new Error(data.error || "Failed to submit item");
-          }
         }
       }, "image/jpeg");
     }

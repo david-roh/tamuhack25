@@ -22,7 +22,7 @@ const seatSchema = z.object({
 const lostItemSchema = z.object({
   flight: z.string().min(1),
   seat: z.string().min(1),
-  itemName: z.string().min(1).max(255),
+  itemName: z.string().max(255),
   itemDescription: z.string().optional(),
   itemImageUrl: z.string().url().optional(),
   status: z.enum(['unclaimed', 'claimed', 'shipped']).default('unclaimed'),

@@ -32,11 +32,11 @@ body {
   background: var(--color-primary);
   color: #FFF;
 
-  &:hover {
+  &:not(:disabled):hover {
     background: var(--color-primary-dark);
   }
 
-  &:active {
+  &:not(:disabled):active {
     background: var(--color-primary-darker);
   }
 }
@@ -47,15 +47,20 @@ body {
   transition: background 300ms;
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-neutral {
   background: #DDD;
   color: #000;
 
-  &:hover {
+  &:not(:disabled):hover {
     background: #BBB;
   }
 
-  &:active {
+  &:not(:disabled):active {
     background: #999;
   }
 }
