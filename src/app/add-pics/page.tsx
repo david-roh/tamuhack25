@@ -18,6 +18,11 @@ type SpeechRecognitionType = any; // TODO: Replace with proper type
 
 export default function Page() {
   const router = useRouter();
+
+  const handleimdone = () => {
+    router.push("/staff");
+  }
+  
   const [flightNumber, setFlightNumber] = useState("\u2014");
   const [speechReg, setSpeechReg] = useState<SpeechRecognitionType | null>(null);
   const [seatNum, setSeatNum] = useState("\u2014");
@@ -214,13 +219,13 @@ export default function Page() {
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <Link href="/staff" className="w-full h-full">
-          <button className="w-full h-full rounded-lg btn btn-primary">I'm Done</button>
-        </Link>
+        <button onClick={handleimdone} className="w-full rounded-lg btn btn-primary">I'm Done</button>
+
       </div>
     </div>
   );
 }
+
 
 // Add these to fix TypeScript errors
 declare global {
