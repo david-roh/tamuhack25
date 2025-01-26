@@ -1,13 +1,118 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "./styles.css";
 
+interface FormData {
+  itemName: string;
+  itemDescription: string;
+  flightNumber: string;
+  seatNumber: string;
+  itemImage?: File;
+}
+
 export default function Page() {
+  const router = useRouter();
   const [flightNumber, setFlightNumber] = useState("\u2014");
   window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const [speechReg, setSpeechReg] = useState<SpeechRecognition>(new SpeechRecognition());
   const [seatNum, setSeatNum] = useState("\u2014");
+  const [formData, setFormData] = useState({
+    flightNumber: "",
+    seatNum: "",
+    photo: null,
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  function handleAddPhoto(event: React.MouseEvent<HTMLButtonElement>) {
+    const addBtn = event.target as HTMLButtonElement;
+    addBtn.disabled = true;
+
+    const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext("2d");
+  
+    if (context) {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(async blob => {
+        if (blob) {
+          const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+          const formData = new FormData();
+          formData.append("itemName", "");
+          formData.append("itemDescription", "");
+          formData.append("flightNumber", flightNumber);
+          formData.append("seatNumber", seatNum);
+          formData.append("itemImage", file);
+          
+          const response = await fetch("/api/lost-items", {
+            method: "POST",
+            body: formData
+          });
+          
+          try {
+            const data = await response.json();
+          }
+          catch (error) {
+            throw new Error("Failed to submit item");
+          }
+
+          addBtn.disabled = false;
+    
+          if (!response.ok) {
+            throw new Error(data.error || "Failed to submit item");
+          }
+        }
+      }, "image/jpeg");
+    }
+  }
+  
+  function handleMicToggle(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.checked) {
+      speechReg.start();
+    } else {
+      speechReg.stop();
+    }
+  }
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      setError('');
+  
+      try {
+        const formDataToSend = new FormData();
+        
+        // Add all form fields to FormData
+        Object.entries(formData).forEach(([key, value]) => {
+          if (value) {
+            formDataToSend.append(key, value);
+          }
+        });
+  
+        const response = await fetch('/api/lost-items', {
+          method: 'POST',
+          body: formDataToSend,
+        });
+  
+        const data = await response.json();
+  
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to submit item');
+        }
+  
+        // toast.success('Item submitted successfully!');
+        router.push('/staff');
+      } catch (err: any) {
+        // toast.error(err.message || 'Failed to submit item');
+        setError(err.message || 'Failed to submit item');
+      } finally {
+        setLoading(false);
+      }
+    };
 
   useEffect(() => {
     // get flight number and makes sure not null
@@ -72,7 +177,7 @@ export default function Page() {
       <div className="row-mic">
         <label className="flex items-center cursor-pointer mic-toggle-label">
           <div className="relative">
-            <input type="checkbox" id="mic-toggle" className="sr-only" onChange={event => handleMicToggle(event, speechReg)} />
+            <input type="checkbox" id="mic-toggle" className="sr-only" onChange={event => handleMicToggle(event)} />
             <div className="block w-14 h-8 rounded-full mic-toggle-bg"></div>
             <div className="dot absolute top-1 bg-white w-6 h-6 rounded-full"></div>
           </div>
@@ -89,46 +194,4 @@ export default function Page() {
       </div>
     </div>
   );
-}
-
-function handleAddPhoto() {
-  const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
-  const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const context = canvas.getContext("2d");
-
-  if (context) {
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob(blob => {
-      if (blob) {
-        const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
-        console.log(file);
-
-        // Create a link element
-        const link = document.createElement("a");
-        // Create a URL for the file
-        const url = URL.createObjectURL(file);
-        // Set the download attribute with a filename
-        link.href = url;
-        link.download = "photo.jpg";
-        // Append the link to the body
-        document.body.appendChild(link);
-        // Programmatically click the link to trigger the download
-        link.click();
-        // Remove the link from the document
-        document.body.removeChild(link);
-        // Revoke the object URL
-        URL.revokeObjectURL(url);
-      }
-    }, "image/jpeg");
-  }
-}
-
-function handleMicToggle(event: React.ChangeEvent<HTMLInputElement>, speechReg: SpeechRecognition) {
-  if (event.target.checked) {
-    speechReg.start();
-  } else {
-    speechReg.stop();
-  }
 }
