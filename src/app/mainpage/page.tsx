@@ -63,6 +63,7 @@ export default function Home() {
             { title: "General information", href: "/info" },
             { title: "Privacy policy", href: "/privacy" },
             { title: "Contact American", href: "/contact" },
+            { title: "Gallery testing", href: "/gallery" }, /*Change the location or take out */
           ].map((item) => (
             <Link
               key={item.href}
