@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "./styles.css";
+import Link  from "next/link";
 
 interface FormData {
   itemName: string;
@@ -192,7 +193,7 @@ export default function Page() {
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <button className="w-full rounded-lg btn btn-primary">I'm Done</button>
+        <button className="w-full rounded-lg btn btn-primary"><Link href={`/gallery?flightNumber=${flightNumber}`}>I'm Done</Link></button>
       </div>
     </div>
   );

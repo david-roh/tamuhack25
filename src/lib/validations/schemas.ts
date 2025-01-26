@@ -80,9 +80,9 @@ export const partialSeatSchema = z.object({
 });
 
 export const partialLostItemSchema = z.object({
-  flight: z.string().min(1).optional(),
-  seat: z.string().min(1).optional(),
-  itemName: z.string().min(1).max(255).optional(),
+  flight: z.string().min(0).optional(),
+  seat: z.string().min(0).optional(),
+  itemName: z.string().min(0).max(255).optional(),
   itemDescription: z.string().optional(),
   itemImageUrl: z.string().url().optional(),
   status: z.enum(['unclaimed', 'claimed', 'shipped']).optional(),
