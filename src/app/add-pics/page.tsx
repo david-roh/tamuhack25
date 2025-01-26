@@ -70,6 +70,8 @@ export default function Page() {
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
     addBtn.disabled = true;
     video.pause();
+    document.querySelector(".root > .row-cam")?.classList.remove("cam-flash");
+    window.requestAnimationFrame(() => document.querySelector(".root > .row-cam")?.classList.add("cam-flash"));
 
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
