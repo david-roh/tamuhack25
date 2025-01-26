@@ -1,13 +1,12 @@
 'use client'
 
 import React, { ChangeEvent } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function FlightInputPage(): JSX.Element {
   const [flightNumber, setFlightNumber] = useState<string>('');
   const [isPopupVisible, setIsPopupVisible] = useState<boolean>(false);
-
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFlightNumber(e.target.value);
@@ -19,7 +18,7 @@ export default function FlightInputPage(): JSX.Element {
 
   const handleConfirm = (): string => {
     // Handle Preprocessing here for flight number
-    return "/add-pics";
+    return `add-pics/?flightNumber=${flightNumber}`
   };
 
   const handleCancel = (): void => {

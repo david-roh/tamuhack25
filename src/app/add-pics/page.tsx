@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./styles.css";
+import {useRouter} from "next/router";
 
 export default function Page() {
+    const [flightNumber, setFlightNumber] = useState('null')
   useEffect(() => {
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
+
+    // get flight number 
+    const params = new URLSearchParams(window.location.search); 
+    const flightNumber = params.get("flightNumber");
+    if(flightNumber)
+        setFlightNumber(flightNumber);
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia({ video: true })
@@ -21,6 +29,9 @@ export default function Page() {
 
   return (
     <div className="root">
+        <div className="text-black">
+            FlightNumber: {flightNumber}
+        </div>
       <div className="row-cam">
         <video id="cam-viewfinder" className="cam-viewfinder"></video>
       </div>
