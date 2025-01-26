@@ -5,14 +5,21 @@ import React, { ChangeEvent, JSX } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plane, ArrowRight } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 export default function FlightInputPage(): JSX.Element {
   const [flightNumber, setFlightNumber] = useState<string>('');
   const [isPopupVisible, setIsPopupVisible] = useState<boolean>(false);
   const [flightDetails, setFlightDetails] = useState<string>('');
 
-  const handleSubmit = (): void => {
-    setIsPopupVisible(true);
+  const router = useRouter(); 
+
+  const handleSubmitstaff = (): void => {
+    router.push("/flightAttendant");
+  };
+
+  const handleSubmitclerk = (): void => {
+    router.push("/staff");
   };
 
   const handleConfirm = (): string => {
@@ -53,7 +60,7 @@ export default function FlightInputPage(): JSX.Element {
         
         <div className="flex gap-[10px]">
             <motion.button
-            onClick={handleSubmit}
+            onClick={handleSubmitclerk}
             className="w-full bg-[#0078D7] text-white py-4 rounded-xl hover:bg-[#005A9C] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
@@ -61,7 +68,7 @@ export default function FlightInputPage(): JSX.Element {
             Clerk
             </motion.button>
             <motion.button
-            onClick={handleSubmit}
+            onClick={handleSubmitstaff}
             className="w-full bg-[#0078D7] text-white py-4 rounded-xl hover:bg-[#005A9C] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
