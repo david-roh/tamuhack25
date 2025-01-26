@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import html2canvas from 'html2canvas';
+import Link from 'next/link';
 
 interface LostItem {
   _id: string;
@@ -316,6 +317,10 @@ export default function VerifyPage() {
   }
 
   return (
+    <>
+    <div className="p-4">
+      <Link href="/staff"><button>Go Back</button></Link>
+    </div>
     <div className="min-h-screen bg-[#1C2632] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg mx-auto bg-black/20 border border-gray-800 rounded-xl shadow-lg overflow-hidden">
         <div className="px-4 py-5 sm:p-6">
@@ -453,6 +458,6 @@ export default function VerifyPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div></>
   );
 } 
