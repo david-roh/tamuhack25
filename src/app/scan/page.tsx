@@ -9,6 +9,10 @@ interface VideoDevice {
   label: string;
 }
 
+interface ScanError extends Error {
+  message: string;
+}
+
 export default function ScanPage() {
   const router = useRouter();
   const [error, setError] = useState<string>('');
@@ -20,7 +24,6 @@ export default function ScanPage() {
   useEffect(() => {
     const initializeCamera = async () => {
       try {
-        // First try to enumerate devices without requesting permission
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices
           .filter(device => device.kind === 'videoinput')
@@ -34,21 +37,7 @@ export default function ScanPage() {
           return;
         }
 
-        // Set available cameras
         setCameras(videoDevices);
-        
-        // Try to get camera access with the first available camera
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: videoDevices[0].deviceId,
-            facingMode: 'environment' // Prefer back camera if available
-          }
-        });
-
-        // Stop the stream since Scanner will request it again
-        stream.getTracks().forEach(track => track.stop());
-
-        // Set the selected camera
         setSelectedCamera(videoDevices[0].deviceId);
       } catch (err: any) {
         console.error('Camera initialization error:', err);
@@ -71,19 +60,29 @@ export default function ScanPage() {
 
       setClaimed(true);
       router.push(`/verify/${token}`);
-    } catch (err) {
+    } catch (error: ScanError) {
       setError('Invalid QR code format');
       setScanning(true); // Resume scanning
     }
   };
 
-  const handleError = (err: Error) => {
-    console.error('Scanner error:', err);
-    setError(err.message);
+  const handleError = (error: unknown) => {
+    console.error('Scanner error:', error);
+    setError(error instanceof Error ? error.message : 'Scanner error occurred');
   };
 
   const handleBackToStaffPage = () => {
     router.push('/staff');
+  };
+
+  interface IDetectedBarcode {
+    rawValue: string;
+  }
+
+  const handleScanWrapper = (detectedCodes: IDetectedBarcode[]) => {
+    if (detectedCodes && detectedCodes.length > 0) {
+      handleScan(detectedCodes[0].rawValue);
+    }
   };
 
   return (
@@ -112,15 +111,11 @@ export default function ScanPage() {
           <div className="aspect-square w-full relative mb-4">
             {selectedCamera ? (
               <Scanner
-                onDecode={handleScan}
+                onScan={handleScanWrapper}
                 onError={handleError}
                 constraints={{
-                  video: {
-                    deviceId: selectedCamera,
-                    facingMode: 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                  }
+                  deviceId: selectedCamera,
+                  facingMode: 'environment'
                 }}
                 containerStyle={{ borderRadius: '0.5rem' }}
               />

@@ -7,6 +7,13 @@ import {
 import { LostItem } from '@/models/LostItem';
 import { Claim } from '@/models/Claim';
 
+interface ItemFoundEmailData {
+  email: string;
+  lostItem: any;
+  flight: any;
+  message?: string;  // Add optional message parameter
+}
+
 export async function sendItemFoundEmail(
   email: string,
   lostItem: any,
@@ -22,7 +29,7 @@ export async function sendItemFoundEmail(
 
   await resend.emails.send({
     from: emailConfig.from,
-    reply_to: emailConfig.replyTo,
+    replyTo: emailConfig.replyTo,
     to: email,
     subject,
     html,
@@ -75,14 +82,33 @@ export async function sendClaimApprovedEmail(
 
 // Error handling wrapper
 export async function sendEmail(
-  type: 'item-found' | 'shipping-confirmation' | 'claim-approved',
-  data: { email?: string; claim?: any; lostItem: any; flight?: any }
+  template: 'item-found' | 'shipping-confirmation' | 'claim-approved',
+  data: ItemFoundEmailData
 ) {
+  const { email, lostItem, flight, message } = data;
+
+  let subject: string;
+  let html: string;
+
   try {
-    switch (type) {
+    switch (template) {
       case 'item-found':
-        if (!data.email || !data.flight) throw new Error('Missing required data for item-found email');
-        await sendItemFoundEmail(data.email, data.lostItem, data.flight);
+        if (!email || !flight) throw new Error('Missing required data for item-found email');
+        subject = 'Lost Item Found on Your Recent Flight';
+        html = `
+          <h1>Lost Item Found</h1>
+          ${message ? `<p><strong>${message}</strong></p>` : ''}
+          <p>A lost item has been found on flight ${flight.flightNumber}:</p>
+          <ul>
+            <li>Item: ${lostItem.itemName}</li>
+            <li>Description: ${lostItem.itemDescription}</li>
+            <li>Found at seat: ${lostItem.seat.seatNumber}</li>
+          </ul>
+          <p>If this is your item, please visit our lost and found desk with the following collection code:</p>
+          <h2>${lostItem.collectionCode}</h2>
+          ${lostItem.qrCodeUrl ? `<img src="${lostItem.qrCodeUrl}" alt="QR Code" />` : ''}
+        `;
+        await sendItemFoundEmail(email, lostItem, flight);
         break;
       
       case 'shipping-confirmation':
@@ -96,10 +122,10 @@ export async function sendEmail(
         break;
       
       default:
-        throw new Error(`Unknown email type: ${type}`);
+        throw new Error(`Unknown email type: ${template}`);
     }
   } catch (error: any) {
     console.error('Failed to send email:', error);
-    throw new Error(`Failed to send ${type} email: ${error.message}`);
+    throw new Error(`Failed to send ${template} email: ${error.message}`);
   }
 } 

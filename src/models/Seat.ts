@@ -15,4 +15,7 @@ const seatSchema = new mongoose.Schema({
   },
 });
 
+seatSchema.index({ flight: 1, seatNumber: 1 });
+seatSchema.index({ customerEmail: 1 });
+
 export default mongoose.models.Seat || mongoose.model('Seat', seatSchema); 

@@ -2,7 +2,7 @@ import { Groq } from 'groq-sdk';
 import { z } from 'zod';
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY!,
 });
 
 // Schema for item description from image
@@ -22,15 +22,11 @@ export async function analyzeImage(imageBase64: string): Promise<ImageAnalysis> 
   const completion = await groq.chat.completions.create({
     messages: [
       {
-        role: 'system',
-        content: 'You are an expert at analyzing images and providing structured information about items. Analyze the image and provide details in JSON format including itemName, itemDescription, condition, category, and optional fields like color, brand, and size.',
-      },
-      {
         role: 'user',
         content: [
           {
             type: 'text',
-            text: 'Please analyze this image and provide detailed information about the item.',
+            text: 'Analyze the image and provide details in JSON format, including itemName, itemDescription, condition, category, and optional fields like color, brand, and size.',
           },
           {
             type: 'image_url',
@@ -44,7 +40,7 @@ export async function analyzeImage(imageBase64: string): Promise<ImageAnalysis> 
     model: 'llama-3.2-90b-vision-preview',
     temperature: 0.3,
     max_tokens: 500,
-    response_format: { type: 'json_object' }
+    response_format: { type: 'json_object' },
   });
 
   const result = imageAnalysisSchema.parse(JSON.parse(completion.choices[0]?.message?.content || '{}'));
@@ -62,12 +58,12 @@ export type TranscriptionResult = z.infer<typeof transcriptionSchema>;
 
 export async function transcribeAudio(audioFile: Buffer): Promise<TranscriptionResult> {
   const file = new File([audioFile], 'audio.wav', { type: 'audio/wav' });
-  
+
   const transcription = await groq.audio.transcriptions.create({
     file,
-    model: "distil-whisper-large-v3-en",
-    response_format: "json",
-    language: "en",
+    model: 'distil-whisper-large-v3-en',
+    response_format: 'json',
+    language: 'en',
     temperature: 0.0,
   });
 
@@ -80,12 +76,8 @@ export async function extractItemDetails(text: string): Promise<Partial<ImageAna
   const completion = await groq.chat.completions.create({
     messages: [
       {
-        role: 'system',
-        content: 'Extract structured information about lost items from text descriptions.',
-      },
-      {
         role: 'user',
-        content: text,
+        content: `Extract structured information about lost items from this description: ${text}`,
       },
     ],
     model: 'llama-3.3-70b-specdec',
@@ -96,4 +88,4 @@ export async function extractItemDetails(text: string): Promise<Partial<ImageAna
 
   const result = imageAnalysisSchema.partial().parse(JSON.parse(completion.choices[0]?.message?.content || '{}'));
   return result;
-} 
+}

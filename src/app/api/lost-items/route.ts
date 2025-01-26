@@ -24,6 +24,21 @@ interface QueryParams {
   flight?: string;
 }
 
+async function getRowPassengers(flight: any, seatNumber: string) {
+  // Extract row number from seat number (e.g., "12A" -> "12")
+  const rowNumber = seatNumber.match(/\d+/)?.[0];
+  if (!rowNumber) return [];
+
+  // Find all seats in the same row with customer emails
+  const rowSeats = await Seat.find({
+    flight: flight._id,
+    seatNumber: new RegExp(`^${rowNumber}[A-Z]`),
+    customerEmail: { $exists: true, $ne: null }
+  });
+
+  return rowSeats;
+}
+
 export async function POST(req: Request) {
   try {
     await dbConnect();
@@ -117,20 +132,30 @@ export async function POST(req: Request) {
       .populate('flight')
       .populate('seat');
 
-    // Send notifications to customers associated with the seat
-    if (seat.customerEmail) {
+    // Send notifications to all passengers in the row
+    const rowPassengers = await getRowPassengers(flight, seatNumber);
+    
+    // Add logging to debug email sending
+    console.log('Found row passengers:', rowPassengers);
+    
+    for (const rowSeat of rowPassengers) {
+      console.log('Sending email to:', rowSeat.customerEmail);
+      
       // Create notification record
       await Notification.create({
-        customerEmail: seat.customerEmail,
+        customerEmail: rowSeat.customerEmail,
         item: lostItem._id,
       });
 
       // Send email notification
       await sendEmail('item-found', {
-        email: seat.customerEmail,
+        email: rowSeat.customerEmail,
         lostItem: populatedItem,
         flight: populatedItem.flight,
+        message: `An item was found near your seat row ${rowSeat.seatNumber.match(/\d+/)?.[0]}. If this might be yours, please follow the instructions below.`
       });
+      
+      console.log('Email sent successfully to:', rowSeat.customerEmail);
     }
 
     // Return the created item
