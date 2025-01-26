@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import "./styles.css";
-import Link  from "next/link";
 
 interface FormData {
   itemName: string;
