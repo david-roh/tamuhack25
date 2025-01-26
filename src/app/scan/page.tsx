@@ -54,13 +54,13 @@ export default function ScanPage() {
     setScanning(false); // Prevent multiple scans
 
     try {
-      // Extract token from QR code URL
-      const token = result.split('/qr/')[1];
+      // Extract token from QR code URL - handle both formats
+      const token = result.split('/qr/')[1]?.split('/api/qr/')[0];
       if (!token) throw new Error('Invalid QR code');
 
       setClaimed(true);
       router.push(`/verify/${token}`);
-    } catch (error: ScanError) {
+    } catch (err) {
       setError('Invalid QR code format');
       setScanning(true); // Resume scanning
     }

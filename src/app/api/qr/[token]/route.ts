@@ -1,43 +1,39 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import LostItem from '@/models/LostItem';
-
-type Params = { params: { token: string } };
+import Flight from '@/models/Flight';
+import Seat from '@/models/Seat';
 
 export async function GET(
   req: Request,
-  context: Params
+  { params }: { params: { token: string } }
 ) {
   try {
+    // Connect to database first
     await dbConnect();
-    
-    // Properly await the params object and its properties
-    const params = await context.params;
-    const token = await params.token;
-    
-    const lostItem = await LostItem.findById(token)
-      .populate('flight')
-      .populate('seat');
+
+    // Get token from params
+    const token = String(params.token);
+
+    // Find the lost item and populate references
+    const lostItem = await LostItem.findOne({ claimToken: token })
+      .populate({
+        path: 'flight',
+        model: Flight
+      })
+      .populate({
+        path: 'seat',
+        model: Seat
+      });
 
     if (!lostItem) {
       return NextResponse.json(
-        { error: 'Invalid or expired QR code' },
+        { error: 'Lost item not found' },
         { status: 404 }
       );
     }
 
-    // Check if item is already claimed
-    if (lostItem.status !== 'unclaimed') {
-      return NextResponse.json(
-        { error: 'Item has already been claimed', status: lostItem.status },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json({
-      item: lostItem,
-      claimUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/claim/${lostItem._id}`,
-    });
+    return NextResponse.json(lostItem);
   } catch (error) {
     console.error('Error processing QR code:', error);
     return NextResponse.json(
@@ -50,17 +46,14 @@ export async function GET(
 // For in-person collection verification
 export async function POST(
   req: Request,
-  context: Params
+  { params }: { params: { token: string } }
 ) {
   try {
     await dbConnect();
     const { verificationCode } = await req.json();
+    const token = String(params.token);
     
-    // Properly await the params object and its properties
-    const params = await context.params;
-    const token = await params.token;
-    
-    const lostItem = await LostItem.findById(token);
+    const lostItem = await LostItem.findOne({ claimToken: token });
 
     if (!lostItem) {
       return NextResponse.json(

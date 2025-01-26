@@ -3,12 +3,14 @@ import { sendEmail } from '@/lib/email/sendEmail';
 
 export async function GET() {
   try {
-    await sendEmail('item-found', {
-      email: 'david.roh@tamu.edu', // Test email
+    const result = await sendEmail('item-found', {
+      email: 'dajero0120+git@gmail.com',
       lostItem: {
         itemName: 'Test Item',
         itemDescription: 'Test Description',
         seat: { seatNumber: '12A' },
+        collectionCode: 'TEST123',
+        qrCodeUrl: null,
       },
       flight: {
         flightNumber: 'TEST123',
@@ -16,9 +18,16 @@ export async function GET() {
       message: 'This is a test email',
     });
 
-    return NextResponse.json({ success: true });
+    console.log('Email send result:', result);
+    return NextResponse.json({ success: true, result });
   } catch (error) {
     console.error('Test email error:', error);
-    return NextResponse.json({ error: 'Failed to send test email' }, { status: 500 });
+    return NextResponse.json(
+      { 
+        error: error instanceof Error ? error.message : 'Failed to send test email',
+        details: error
+      }, 
+      { status: 500 }
+    );
   }
 } 

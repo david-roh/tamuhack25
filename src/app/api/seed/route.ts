@@ -62,9 +62,9 @@ export async function POST() {
     const seats = [];
     for (const flight of flights) {
       const flightSeats = await Seat.create([
-        { seatNumber: '12A', flight: flight._id, customerEmail: 'david.roh@tamu.edu' },
-        { seatNumber: '12B', flight: flight._id, customerEmail: 'david.roh@tamu.edu' },
-        { seatNumber: '14C', flight: flight._id, customerEmail: 'david.roh@tamu.edu' }
+        { seatNumber: '12A', flight: flight._id, customerEmail: 'dajero0120+git@gmail.com' },
+        { seatNumber: '12B', flight: flight._id, customerEmail: 'dajero0120+git@gmail.com' },
+        { seatNumber: '14C', flight: flight._id, customerEmail: 'dajero0120+git@gmail.com' }
       ]);
       seats.push(...flightSeats);
     }
@@ -129,14 +129,14 @@ export async function POST() {
         token: token,
         status: "available",
         flight: defaultFlight._id,
-        customerEmail: 'david.roh@tamu.edu'
+        customerEmail: 'dajero0120+git@gmail.com'
       };
       tokenSeats.push(seat);
       seatData.push({
         seatNumber: seat.seatNumber,
         token: seat.token,
         qrCodeUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/qr/${seat.token}`,
-        customerEmail: 'david.roh@tamu.edu'
+        customerEmail: 'dajero0120+git@gmail.com'
       });
     }
 

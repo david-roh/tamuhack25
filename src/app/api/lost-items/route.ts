@@ -9,6 +9,7 @@ import { lostItemSchema } from '@/lib/validations/schemas';
 import { analyzeImage } from '@/lib/groq';
 import { uploadImage } from '@/lib/cloudinary';
 import { sendEmail } from '@/lib/email/sendEmail';
+import { generateToken } from '@/lib/token';
 
 interface LostItemData {
   flight: string;
@@ -34,8 +35,9 @@ async function getRowPassengers(flight: any, seatNumber: string) {
     flight: flight._id,
     seatNumber: new RegExp(`^${rowNumber}[A-Z]`),
     customerEmail: { $exists: true, $ne: null }
-  });
+  }).sort({ seatNumber: 1 });
 
+  console.log(`Found ${rowSeats.length} passengers in row ${rowNumber}`);
   return rowSeats;
 }
 
@@ -107,12 +109,16 @@ export async function POST(req: Request) {
     // Validate the data
     const validatedData = lostItemSchema.parse(itemData);
 
-    // Create the lost item
-    const lostItem = await LostItem.create(validatedData);
+    // Generate a claim token when creating the item
+    const claimToken = generateToken();
+    const lostItem = await LostItem.create({
+      ...validatedData,
+      claimToken,
+    });
 
-    // Generate QR code for the claim token
+    // Generate QR code using the claim token - remove /api from URL
     const qrCodeUrl = await generateQRCode(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/qr/${lostItem.claimToken}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/qr/${claimToken}`,
       {
         width: 400,
         margin: 4,
@@ -132,33 +138,40 @@ export async function POST(req: Request) {
       .populate('flight')
       .populate('seat');
 
-    // Send notifications to all passengers in the row
+    // Find all passengers in the same row
     const rowPassengers = await getRowPassengers(flight, seatNumber);
-    
-    // Add logging to debug email sending
-    console.log('Found row passengers:', rowPassengers);
-    
-    for (const rowSeat of rowPassengers) {
-      console.log('Sending email to:', rowSeat.customerEmail);
-      
-      // Create notification record
-      await Notification.create({
-        customerEmail: rowSeat.customerEmail,
-        item: lostItem._id,
-      });
+    console.log(`Sending notifications to ${rowPassengers.length} passengers in the row`);
 
-      // Send email notification
-      await sendEmail('item-found', {
-        email: rowSeat.customerEmail,
-        lostItem: populatedItem,
-        flight: populatedItem.flight,
-        message: `An item was found near your seat row ${rowSeat.seatNumber.match(/\d+/)?.[0]}. If this might be yours, please follow the instructions below.`
-      });
-      
-      console.log('Email sent successfully to:', rowSeat.customerEmail);
+    // Send notifications to all passengers in the row
+    for (const rowSeat of rowPassengers) {
+      try {
+        console.log(`Sending notification to passenger in seat ${rowSeat.seatNumber}`);
+        
+        // Create notification record
+        await Notification.create({
+          customerEmail: rowSeat.customerEmail,
+          item: lostItem._id,
+        });
+
+        // Send email notification
+        await sendEmail('item-found', {
+          email: rowSeat.customerEmail,
+          lostItem: {
+            ...populatedItem.toObject(),
+            qrCodeUrl,
+            claimToken,
+          },
+          flight: populatedItem.flight,
+          message: `An item was found near your seat (Row ${rowSeat.seatNumber.match(/\d+/)?.[0]}). If this might be yours, please follow the instructions below.`
+        });
+
+        console.log(`Successfully sent notification to ${rowSeat.customerEmail}`);
+      } catch (error) {
+        console.error(`Failed to send notification to ${rowSeat.customerEmail}:`, error);
+        // Continue with other notifications even if one fails
+      }
     }
 
-    // Return the created item
     return NextResponse.json(lostItem, { status: 201 });
   } catch (error) {
     console.error('Error creating lost item:', error);

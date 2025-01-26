@@ -32,7 +32,7 @@ const lostItemSchema = new mongoose.Schema({
   },
   claimToken: {
     type: String,
-    default: generateClaimToken,
+    required: true,
   },
   collectionCode: {
     type: String,
@@ -48,5 +48,8 @@ const lostItemSchema = new mongoose.Schema({
 // Create indexes
 lostItemSchema.index({ status: 1 });
 lostItemSchema.index({ flight: 1, status: 1 });
+
+// Add an index for faster token lookups
+lostItemSchema.index({ claimToken: 1 }, { unique: true });
 
 export default mongoose.models.LostItem || mongoose.model('LostItem', lostItemSchema); 
