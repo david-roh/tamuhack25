@@ -46,13 +46,17 @@ export default function Page() {
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-          video.srcObject = stream;
+      .then(stream => {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.width = video.videoWidth;
+          video.height = video.videoHeight;
           video.play();
-        })
-        .catch(err => {
-          console.error("Error accessing the camera: ", err);
-        });
+        };
+      })
+      .catch(err => {
+        console.error("Error accessing the camera: ", err);
+      });
     }
   }, []);
 
@@ -88,7 +92,37 @@ export default function Page() {
 }
 
 function handleAddPhoto() {
-  alert("yoop");
+  const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const context = canvas.getContext("2d");
+
+  if (context) {
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(blob => {
+      if (blob) {
+        const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+        console.log(file);
+
+        // Create a link element
+        const link = document.createElement("a");
+        // Create a URL for the file
+        const url = URL.createObjectURL(file);
+        // Set the download attribute with a filename
+        link.href = url;
+        link.download = "photo.jpg";
+        // Append the link to the body
+        document.body.appendChild(link);
+        // Programmatically click the link to trigger the download
+        link.click();
+        // Remove the link from the document
+        document.body.removeChild(link);
+        // Revoke the object URL
+        URL.revokeObjectURL(url);
+      }
+    }, "image/jpeg");
+  }
 }
 
 function handleMicToggle(event: React.ChangeEvent<HTMLInputElement>, speechReg: SpeechRecognition) {
