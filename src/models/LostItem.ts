@@ -1,6 +1,17 @@
 import mongoose from 'mongoose';
 import { generateClaimToken } from '@/lib/qrcode';
 
+const shippingDetailsSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  address: String,
+  city: String,
+  state: String,
+  postalCode: String,
+  country: String,
+  paymentIntentId: String
+});
+
 const lostItemSchema = new mongoose.Schema({
   flight: {
     type: mongoose.Schema.Types.ObjectId,
@@ -41,6 +52,8 @@ const lostItemSchema = new mongoose.Schema({
   claimedAt: {
     type: Date,
   },
+  shippingDetails: shippingDetailsSchema,
+  shippedAt: Date,
 }, {
   timestamps: true,
 });
