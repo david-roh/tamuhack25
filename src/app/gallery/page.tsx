@@ -36,6 +36,7 @@ interface LostItem {
 export default function Gallery() {
   const router = useRouter(); // Initialize route
   const [items, setItems] = useState<LostItem[]>([]);
+  const [loading, setLoading] = useState(true);
   // reference using http://localhost:3000/gallery?flightNumber=1234
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function Gallery() {
           const data = await res.json();
           console.log(data)
           setItems(data);
+          setLoading(false);
       };
   
       fetchItems();
@@ -114,6 +116,10 @@ export default function Gallery() {
           </Link>
           <h1 className="text-xl font-semibold">{items.length} lost items</h1>
         </header>
+
+        {loading && <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
+        </div>}
 
         {/* Scrollable Gallery */}
         <ScrollArea className="h-[600px] rounded-md border border-gray-800">

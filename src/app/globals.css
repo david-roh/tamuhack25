@@ -1,3 +1,25 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+} */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,20 +27,20 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --color-primary: #3030A0;
-  --color-primary-dark: #101080;
-  --color-primary-darker: #000060;
-  --color-primary-verylight: #D0D0F0;
+  --color-primary: #4A90E2;
+  --color-primary-dark: #357ABD;
+  --color-primary-darker: #1C2632;
+  --color-primary-verylight: #E5F0FA;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #1C2632;
     --foreground: #ededed;
-    --color-primary: #4242c6;
-    --color-primary-dark: #2222A6;
-    --color-primary-darker: #020286;
-    --color-primary-verylight: #D0D0F0;
+    --color-primary: #4A90E2;
+    --color-primary-dark: #357ABD;
+    --color-primary-darker: #1C2632;
+    --color-primary-verylight: #E5F0FA;
   }
 }
 

@@ -153,7 +153,7 @@ export async function POST(req: Request) {
           item: lostItem._id,
         });
 
-        // Send email notification
+        // Send email notification with updated template
         await sendEmail('item-found', {
           email: rowSeat.customerEmail,
           lostItem: {
@@ -162,7 +162,18 @@ export async function POST(req: Request) {
             claimToken,
           },
           flight: populatedItem.flight,
-          message: `An item was found near your seat (Row ${rowSeat.seatNumber.match(/\d+/)?.[0]}). If this might be yours, please follow the instructions below.`
+          message: `An item was found near your seat (Row ${rowSeat.seatNumber.match(/\d+/)?.[0]}). 
+            You can either collect it in person or have it shipped to your address.`,
+          options: {
+            collect: {
+              code: populatedItem.collectionCode,
+              verifyUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/verify/${claimToken}`,
+            },
+            shipping: {
+              url: `${process.env.NEXT_PUBLIC_BASE_URL}/shipping/${claimToken}`,
+              cost: '$9.99',
+            }
+          }
         });
 
         console.log(`Successfully sent notification to ${rowSeat.customerEmail}`);

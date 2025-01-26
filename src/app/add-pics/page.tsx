@@ -13,11 +13,13 @@ interface FormData {
   itemImage?: File;
 }
 
+// Move SpeechRecognition type definition outside component
+type SpeechRecognitionType = any; // TODO: Replace with proper type
+
 export default function Page() {
   const router = useRouter();
   const [flightNumber, setFlightNumber] = useState("\u2014");
-  window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const [speechReg, setSpeechReg] = useState<SpeechRecognition>(new SpeechRecognition());
+  const [speechReg, setSpeechReg] = useState<SpeechRecognitionType | null>(null);
   const [seatNum, setSeatNum] = useState("\u2014");
   const [formData, setFormData] = useState({
     flightNumber: "",
@@ -26,6 +28,42 @@ export default function Page() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Initialize speech recognition in useEffect
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+          console.info(event.results);
+          const result = event.results[event.resultIndex];
+          if (result.isFinal) {
+            const transcript = result[0].transcript
+              .replace(/\s/g, "")
+              .replace(/[^0-9A-Z]/g, "");
+            console.log(`Speech recognized: ${transcript}`);
+            if (!/\d+[A-Z]$/.test(transcript)) {
+              console.log("Invalid transcript.");
+              return;
+            }
+            const matches = transcript.match(/\d+[A-Z]$/);
+            if (matches !== null) {
+              const seat = matches[0];
+              console.log(`Seats recognized: ${seat}`);
+              setSeatNum(seat);
+            }
+          }
+        };
+
+        setSpeechReg(recognition);
+      }
+    }
+  }, []);
 
   function handleAddPhoto(event: React.MouseEvent<HTMLButtonElement>) {
     const addBtn = event.target as HTMLButtonElement;
@@ -74,6 +112,8 @@ export default function Page() {
   }
   
   function handleMicToggle(event: React.ChangeEvent<HTMLInputElement>) {
+    if (!speechReg) return;
+    
     if (event.target.checked) {
       speechReg.start();
     } else {
@@ -123,37 +163,11 @@ export default function Page() {
     const fNum = params.get("flightNumber");
     if (flightNumber) setFlightNumber(fNum === null ? "\u2014" : fNum);
 
-    // Row number speech recognition
-    speechReg.continuous = true;
-    speechReg.lang = "en-US";
-    speechReg.interimResults = false;
-
-    speechReg.onresult = (event) => {
-      console.info(event.results);
-      const result = event.results[event.resultIndex];
-      if (result.isFinal) {
-        const transcript = result[0].transcript
-          .replace(/\s/g, "")
-          .replace(/[^0-9A-Z]/g, "");
-        console.log(`Speech recognized: ${transcript}`);
-        if (!/\d+[A-Z]$/.test(transcript)) {
-          console.log("Invalid transcript.");
-          return;
-        }
-        const matches = transcript.match(/\d+[A-Z]$/);
-        if (matches !== null) {
-          const seat = matches[0];
-          console.log(`Seats recognized: ${seat}`);
-          setSeatNum(seat);
-        }
-      }
-    };
-
     // Camera
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       .then(stream => {
         video.srcObject = stream;
         video.onloadedmetadata = () => {
@@ -169,7 +183,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="root">
+    <div className="root" style={{ background: "#f2f4fd" }}>
       <div className="row-header">
         <a href="/flightAttendant" className="btn btn-neutral">&#x2B05; Back</a>
         <h1 className="text-2xl font-bold text-center">{flightNumber}</h1>
@@ -186,7 +200,14 @@ export default function Page() {
           </div>
           <div className="ml-3 text-gray-700 font-medium">Microphone</div>
         </label>
-        <div className="current-seat-num">{seatNum}</div>
+        <div className="current-seat-num">
+          <input
+            type="text"
+            value={seatNum}
+            onChange={evt => setSeatNum(evt.target.value)}
+            onFocus={evt => {if (evt.target.value === "\u2014") {evt.target.value = "";}}}
+            onBlur={evt => {evt.target.value = evt.target.value.trim(); if (evt.target.value === "") {evt.target.value = "\u2014";}}} />
+        </div>
       </div>
       <div className="row-btns">
         <button className="w-full rounded-lg btn btn-neutral">Delete Last Photo</button>
@@ -197,4 +218,12 @@ export default function Page() {
       </div>
     </div>
   );
+}
+
+// Add these to fix TypeScript errors
+declare global {
+  interface Window {
+    SpeechRecognition?: any;
+    webkitSpeechRecognition?: any;
+  }
 }

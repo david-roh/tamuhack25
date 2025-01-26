@@ -3,6 +3,14 @@ import dbConnect from '@/lib/db';
 import LostItem from '@/models/LostItem';
 import Flight from '@/models/Flight';
 import Seat from '@/models/Seat';
+import { z } from 'zod'; // Add validation
+import { timingSafeEqual } from 'crypto';
+import AuditLog from '@/models/AuditLog';
+
+// Validation schema for verification code
+const verificationSchema = z.object({
+  verificationCode: z.string().min(6).max(8)
+});
 
 export async function GET(
   req: Request,
@@ -10,27 +18,50 @@ export async function GET(
 ) {
   try {
     await dbConnect();
+    // Await params before destructuring
+    const token = (await params).token;
 
-    // Await the params object before destructuring
-    const { token } = await params;
-
-    // Find the lost item and populate references
-    const lostItem = await LostItem.findOne({ claimToken: token })
+    const lostItem = await LostItem.findOne({ 
+      claimToken: token
+    })
       .populate({
         path: 'flight',
-        model: Flight
+        model: Flight,
+        select: 'flightNumber originCode destinationCode departureTime'
       })
       .populate({
         path: 'seat',
-        model: Seat
-      });
+        model: Seat,
+        select: 'seatNumber'
+      })
+      .lean(); // Add lean() to convert to plain object
 
     if (!lostItem) {
       return NextResponse.json(
-        { error: 'Lost item not found' },
+        { error: 'Item not found' },
         { status: 404 }
       );
     }
+
+    // Transform shippingDetails to match the frontend interface
+    if (lostItem.status === 'shipped' && lostItem.shippingDetails) {
+      lostItem.shipping = {
+        address: lostItem.shippingDetails.address,
+        city: lostItem.shippingDetails.city,
+        state: lostItem.shippingDetails.state,
+        postalCode: lostItem.shippingDetails.postalCode,
+        country: lostItem.shippingDetails.country,
+        trackingNumber: lostItem.shippingDetails.trackingNumber
+      };
+    }
+
+    // Add audit log
+    await AuditLog.create({
+      action: 'item_viewed',
+      itemId: lostItem._id,
+      token,
+      timestamp: new Date()
+    });
 
     return NextResponse.json(lostItem);
   } catch (error) {
@@ -49,32 +80,61 @@ export async function POST(
 ) {
   try {
     await dbConnect();
-    const { verificationCode } = await req.json();
+    // Await params before destructuring
+    const token = (await params).token;
     
-    // Await the params object before destructuring
-    const { token } = await params;
+    // Validate request body
+    const body = await req.json();
+    const { verificationCode } = verificationSchema.parse(body);
     
-    const lostItem = await LostItem.findOne({ claimToken: token });
+    const lostItem = await LostItem.findOne({ 
+      claimToken: token,
+      status: 'unclaimed'
+    });
 
     if (!lostItem) {
       return NextResponse.json(
-        { error: 'Invalid or expired QR code' },
+        { error: 'Item not found or already claimed' },
         { status: 404 }
       );
     }
 
-    // Verify the collection code
-    if (lostItem.collectionCode !== verificationCode) {
+    // Convert strings to Buffers for timing-safe comparison
+    const codeBuffer = Buffer.from(lostItem.collectionCode);
+    const inputBuffer = Buffer.from(verificationCode);
+
+    // Verify the collection code with timing-safe comparison
+    if (
+      codeBuffer.length !== inputBuffer.length || 
+      !timingSafeEqual(codeBuffer, inputBuffer)
+    ) {
+      // Add failed attempt to audit log
+      await AuditLog.create({
+        action: 'verification_failed',
+        itemId: lostItem._id,
+        token,
+        verificationCode,
+        timestamp: new Date()
+      });
+
       return NextResponse.json(
         { error: 'Invalid verification code' },
         { status: 400 }
       );
     }
 
-    // Update item status to claimed
+    // Update item status
     lostItem.status = 'claimed';
     lostItem.claimedAt = new Date();
     await lostItem.save();
+
+    // Add successful claim to audit log
+    await AuditLog.create({
+      action: 'item_claimed',
+      itemId: lostItem._id,
+      token,
+      timestamp: new Date()
+    });
 
     return NextResponse.json({
       message: 'Item collected successfully',

@@ -5,23 +5,56 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { format } from 'date-fns';
 
+// Update interfaces to match Mongoose document structure
+interface Flight {
+  _id: string;
+  flightNumber: string;
+  originCode: string;
+  destinationCode: string;
+  departureTime: Date;
+  arrivalTime: Date;
+}
+
+interface Seat {
+  _id: string;
+  flight: Flight;
+  seatNumber: string;
+  customerEmail?: string;
+}
+
+interface ShippingDetails {
+  name?: string;
+  email?: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  trackingNumber?: string;
+  paymentIntentId?: string;
+}
+
 interface LostItem {
   _id: string;
-  itemName: string;
-  itemDescription: string;
+  flight: Flight;
+  seat: Seat;
+  itemName?: string;
+  itemDescription?: string;
   itemImageUrl?: string;
-  status: string;
+  status: 'unclaimed' | 'claimed' | 'shipped';
+  qrCodeUrl?: string;
+  claimToken: string;
   collectionCode: string;
   claimedAt?: string;
-  flight: {
-    flightNumber: string;
-    originCode: string;
-    destinationCode: string;
-  };
-  seat: {
-    seatNumber: string;
-    customerEmail?: string;
-  };
+  shippingDetails?: ShippingDetails;
+  shippedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Add custom error type
+interface ApiError extends Error {
+  message: string;
 }
 
 export default function ReceiptPage() {
@@ -31,21 +64,50 @@ export default function ReceiptPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchItemDetails();
+    if (id) {
+      fetchItemDetails();
+    }
   }, [id]);
 
   const fetchItemDetails = async () => {
     try {
-      const response = await fetch(`/api/lost-items/${id}`);
-      const data = await response.json();
+      console.log('Fetching item details for id:', id);
+      const response = await fetch(`/api/lost-items/${id}`, {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
       
       if (!response.ok) {
-        throw new Error(data.error);
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch item details');
       }
       
-      setItem(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch item details');
+      const data = await response.json();
+      console.log('Received item data:', data);
+      
+      // Transform the data to match our interface
+      const transformedData: LostItem = {
+        ...data,
+        flight: data.flight && {
+          ...data.flight,
+          departureTime: new Date(data.flight.departureTime),
+          arrivalTime: new Date(data.flight.arrivalTime),
+        },
+        seat: data.seat && {
+          ...data.seat,
+          flight: data.flight, // Make sure seat has reference to flight
+        },
+        claimedAt: data.claimedAt ? new Date(data.claimedAt).toISOString() : undefined,
+        shippedAt: data.shippedAt ? new Date(data.shippedAt).toISOString() : undefined,
+      };
+      
+      console.log('Transformed data:', transformedData);
+      setItem(transformedData);
+    } catch (err: unknown) {
+      console.error('Error fetching item:', err);
+      const error = err as ApiError;
+      setError(error.message || 'Failed to fetch item details');
     } finally {
       setLoading(false);
     }
@@ -80,7 +142,7 @@ export default function ReceiptPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-8 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-white p-8 max-w-2xl mx-auto text-black">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold">Lost Item Collection Receipt</h1>
@@ -95,10 +157,11 @@ export default function ReceiptPage() {
           <div>
             <h2 className="text-lg font-semibold mb-4">Item Details</h2>
             <div className="space-y-2">
-              <p><span className="font-medium">Item:</span> {item.itemName}</p>
-              <p><span className="font-medium">Description:</span> {item.itemDescription}</p>
-              <p><span className="font-medium">Status:</span> {item.status}</p>
-              {item.claimedAt && (
+              <p><span className="font-medium">Item:</span> {item?.itemName || 'N/A'}</p>
+              <p><span className="font-medium">Description:</span> {item?.itemDescription || 'N/A'}</p>
+              <p><span className="font-medium">Status:</span> {item?.status || 'N/A'}</p>
+              <p><span className="font-medium">Collection Code:</span> {item?.collectionCode}</p>
+              {item?.claimedAt && (
                 <p>
                   <span className="font-medium">Collected On:</span>{' '}
                   {format(new Date(item.claimedAt), 'MMMM d, yyyy h:mm a')}
@@ -109,16 +172,47 @@ export default function ReceiptPage() {
           <div>
             <h2 className="text-lg font-semibold mb-4">Flight Information</h2>
             <div className="space-y-2">
-              <p><span className="font-medium">Flight:</span> {item.flight.flightNumber}</p>
+              <p>
+                <span className="font-medium">Flight:</span>{' '}
+                {item?.flight?.flightNumber || 'N/A'}
+              </p>
               <p>
                 <span className="font-medium">Route:</span>{' '}
-                {item.flight.originCode} → {item.flight.destinationCode}
+                {item?.flight ? `${item.flight.originCode} → ${item.flight.destinationCode}` : 'N/A'}
               </p>
-              <p><span className="font-medium">Seat:</span> {item.seat.seatNumber}</p>
+              <p>
+                <span className="font-medium">Departure:</span>{' '}
+                {item?.flight?.departureTime ? 
+                  format(new Date(item.flight.departureTime), 'MMM d, yyyy h:mm a') : 
+                  'N/A'
+                }
+              </p>
+              <p>
+                <span className="font-medium">Seat:</span>{' '}
+                {item?.seat?.seatNumber || 'N/A'}
+              </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Shipping Details if applicable */}
+      {item.shippingDetails && (
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold mb-4">Shipping Details</h2>
+          <div className="space-y-2">
+            <p><span className="font-medium">Name:</span> {item.shippingDetails.name || 'N/A'}</p>
+            <p><span className="font-medium">Address:</span> {item.shippingDetails.address}</p>
+            <p>
+              {item.shippingDetails.city}, {item.shippingDetails.state} {item.shippingDetails.postalCode}
+            </p>
+            <p>{item.shippingDetails.country}</p>
+            {item.shippingDetails.trackingNumber && (
+              <p><span className="font-medium">Tracking:</span> {item.shippingDetails.trackingNumber}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Image */}
       {item.itemImageUrl && (
@@ -126,7 +220,7 @@ export default function ReceiptPage() {
           <div className="aspect-video relative w-full max-w-md mx-auto">
             <Image
               src={item.itemImageUrl}
-              alt={item.itemName}
+              alt={item.itemName || 'Lost Item'}
               fill
               className="object-cover rounded-lg"
             />
