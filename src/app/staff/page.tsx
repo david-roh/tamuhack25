@@ -94,7 +94,7 @@ export default function StaffDashboard() {
                 Home
               </Link>
             </Button>
-            <Button asChild className="bg-[#4A90E2] hover:bg-[#4A90E2]/90 py-2 px-1.5 flex items-center">
+            <Button asChild className="text-[#4A90E2] hover:bg-[#4A90E2]/10 py-2 px-1.5 flex items-center">
               <Link href="/staff/submit" className="flex items-center text-lg font-bold">
                 <Plus className="h-5 w-5 mr-2" />
                 Submit Item

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 
 interface FormData {
   itemName: string;
@@ -98,7 +99,10 @@ export default function SubmitLostItem() {
   };
 
   return (
-
+    <>
+    <div className="p-4">
+      <Link href="/staff"><button>Go Back</button></Link>
+    </div>
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="px-4 py-5 sm:p-6">
@@ -302,6 +306,6 @@ export default function SubmitLostItem() {
           </form>
         </div>
       </div>
-    </div>
+    </div></>
   );
 } 
