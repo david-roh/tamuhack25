@@ -60,6 +60,10 @@ export default function FlightInputPage(): JSX.Element {
   };
 
   return (
+    <>
+    <div className="p-4">
+      <Link href="/staffTeam"><button>Go Back</button></Link>
+    </div>
     <div 
       className="h-screen flex flex-col justify-center items-center bg-[#1C2632] relative overflow-hidden"
     >
@@ -93,7 +97,7 @@ export default function FlightInputPage(): JSX.Element {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.95 }}
         >
-          Track Flight
+          Add Lost Items
         </motion.button>
       </motion.div>
       <AnimatePresence>
@@ -139,6 +143,6 @@ export default function FlightInputPage(): JSX.Element {
           </motion.div>
         )}
       </AnimatePresence>
-      </div>
+      </div></>
   );
 }
