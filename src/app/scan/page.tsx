@@ -86,7 +86,7 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="px-4 py-5 sm:p-6">
           <div className="flex justify-between items-center mb-4">
@@ -97,7 +97,7 @@ export default function ScanPage() {
               <select
                 value={selectedCamera}
                 onChange={(e) => setSelectedCamera(e.target.value)}
-                className="block rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="block rounded-md bg-gray-200 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900"
               >
                 {cameras.map((camera) => (
                   <option key={camera.deviceId} value={camera.deviceId}>
@@ -117,7 +117,7 @@ export default function ScanPage() {
                   deviceId: selectedCamera,
                   facingMode: 'environment'
                 }}
-                containerStyle={{ borderRadius: '0.5rem' }}
+                // containerStyle={{ borderRadius: '0.5rem' }} commented out didn't work for mine(Sarah)
               />
             ) : (
               <p className="text-sm text-gray-500">Initializing camera...</p>

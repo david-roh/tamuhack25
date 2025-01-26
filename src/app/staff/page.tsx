@@ -87,22 +87,22 @@ export default function StaffDashboard() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white">Lost Items Dashboard</h1>
-          <div className="space-x-3 flex flex-wrap">
-            <Button asChild variant="outline" className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10">
-              <Link href="/customermainpage">
-                <Home className="h-4 w-4 mr-2" />
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 bg-black/20 p-2 rounded-lg">
+            <Button asChild variant="outline" className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10 py-2 px-1.5 flex items-center">
+              <Link href="/customermainpage" className="flex items-center text-lg font-normal">
+                <Home className="h-6 w-6 mr-2" />
                 Home
               </Link>
             </Button>
-            <Button asChild className="bg-[#4A90E2] hover:bg-[#4A90E2]/90">
-              <Link href="/staff/submit">
-                <Plus className="h-4 w-4 mr-2" />
+            <Button asChild className="bg-[#4A90E2] hover:bg-[#4A90E2]/90 py-2 px-1.5 flex items-center">
+              <Link href="/staff/submit" className="flex items-center text-lg font-bold">
+                <Plus className="h-5 w-5 mr-2" />
                 Submit Item
               </Link>
             </Button>
-            <Button asChild variant="outline" className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10">
-              <Link href="/scan">
-                <QrCode className="h-4 w-4 mr-2" />
+            <Button asChild variant="outline" className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10 py-2 px-1.5 flex items-center">
+              <Link href="/scan" className="flex items-center text-lg font-normal">
+                <QrCode className="h-5 w-5 mr-2" />
                 Scan QR Code
               </Link>
             </Button>
