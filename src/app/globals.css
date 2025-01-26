@@ -75,14 +75,14 @@ body {
 }
 
 .btn-neutral {
-  background: #DDD;
+  background: var(--color-primary-lighter);
   color: #000;
 
   &:not(:disabled):hover {
-    background: #BBB;
+    background: rgb(138, 157, 178);
   }
 
   &:not(:disabled):active {
-    background: #999;
+    background: rgb(106, 125, 146);
   }
 }
