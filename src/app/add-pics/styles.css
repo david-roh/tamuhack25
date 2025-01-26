@@ -94,6 +94,15 @@
   border-top-right-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
   line-height: 50px;
+
+  & > input {
+    width: 100px;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font: inherit;
+  }
 }
 
 .row-btns {
