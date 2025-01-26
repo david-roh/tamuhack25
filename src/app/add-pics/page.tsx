@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import "./styles.css";
 
 interface FormData {
@@ -213,7 +214,9 @@ export default function Page() {
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <button className="w-full rounded-lg btn btn-primary">I'm Done</button>
+        <Link href="/staff" className="w-full h-full">
+          <button className="w-full h-full rounded-lg btn btn-primary">I'm Done</button>
+        </Link>
       </div>
     </div>
   );
