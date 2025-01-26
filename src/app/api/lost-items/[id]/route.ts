@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import LostItem from '@/models/LostItem';
@@ -7,13 +8,23 @@ import { uploadImage, deleteImage } from '@/lib/cloudinary';
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const item = await LostItem.findById(params.id)
-      .populate('flight')
-      .populate('seat');
+    const { id } = await context.params;
+    console.log('Fetching item with id/token:', id);
+    
+    // Try to find item by either ObjectId or claimToken
+    const item = await LostItem.findOne({
+      $or: [
+        // Check if id is a valid ObjectId first
+        { _id: mongoose.isValidObjectId(id) ? id : null },
+        { claimToken: id }
+      ]
+    }).populate('flight').populate('seat');
+
+    console.log('Found item:', item);
 
     if (!item) {
       return NextResponse.json(
@@ -22,25 +33,31 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(item);
+    // Return the item data
+    return NextResponse.json({
+      item,
+      status: item.status
+    });
   } catch (error: any) {
+    console.error('Error fetching item:', error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
+    const { id } = await context.params;
     const body = await req.json();
     let updateData = { ...body };
 
     // If new image is provided, upload it
     if (body.image) {
       // Get the current item to delete old image if exists
-      const currentItem = await LostItem.findById(params.id);
+      const currentItem = await LostItem.findById(id);
       if (currentItem?.itemImageUrl) {
         await deleteImage(currentItem.itemImageUrl);
       }
@@ -60,7 +77,7 @@ export async function PATCH(
     }
     
     const item = await LostItem.findByIdAndUpdate(
-      params.id,
+      id,
       { ...validation.data },
       { new: true, runValidators: true }
     ).populate('flight').populate('seat');
@@ -80,11 +97,12 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const item = await LostItem.findById(params.id);
+    const { id } = await context.params;
+    const item = await LostItem.findById(id);
 
     if (!item) {
       return NextResponse.json(

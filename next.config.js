@@ -5,9 +5,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
-        pathname: '/**',
       },
     ],
+    // Allow unoptimized images for local blob URLs
+    unoptimized: true,
   },
 };
 
