@@ -3,21 +3,21 @@
   "short_name": "AAFound",
   "icons": [
     {
-      "src": "aa-app-logo.png",
+      "src": "aa-logo.png",
       "type": "image/png",
-      "sizes": "512x512",
+      "sizes": "384x384",
       "purpose": "any"
     },
     {
-      "src": "aa-logo-large-bg.png",
+      "src": "aa-logo-square.png",
       "type": "image/png",
-      "sizes": "512x512",
+      "sizes": "384x384",
       "purpose": "maskable"
     }
   ],
   "display": "standalone",
-  "background_color": "#FAFAFA",
-  "theme_color": "#FAFAFA",
+  "background_color": "#1C2632",
+  "theme_color": "#1C2632",
   "orientation": "any",
   "start_url": "/"
 }
