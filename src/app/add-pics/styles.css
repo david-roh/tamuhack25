@@ -56,6 +56,14 @@
   flex-direction: row;
   gap: 10px;
   padding-left: 10px;
+  outline-style: solid;
+  outline-width: 2.5px;
+  outline-color: transparent;
+  transition: outline-color 200ms;
+}
+
+.row-mic:has(#mic-toggle:checked) {
+  outline-color: var(--color-primary);
 }
 
 .mic-toggle-label .mic-toggle-bg {
