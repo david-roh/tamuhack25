@@ -1,3 +1,13 @@
+:root {
+  --color-primary: #4a90e2;
+  --color-primary-light: #6ba5e7;
+  --color-primary-verylight: rgba(74, 144, 226, 0.2);
+  --color-background: #1c2632;
+  --color-surface: rgba(255, 255, 255, 0.1);
+  --color-text: #ffffff;
+  --color-text-secondary: #9ca3af;
+}
+
 .root {
   display: flex;
   flex-direction: column;
@@ -5,8 +15,8 @@
   padding: 10px;
   flex: 1;
   height: 100vh;
-  background: #FFF;
-  color: #000;
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 .root > * {
@@ -14,7 +24,7 @@
   flex-direction: row;
   gap: 10px;
   height: 50px;
-  background: #EEE;
+  background: var(--color-surface);
   border-radius: 0.5rem;
 
   & > * {
@@ -36,10 +46,13 @@
     border-bottom-left-radius: 0.5rem;
     line-height: 50px;
     padding: 0 10px;
+    background-color: var(--color-primary);
+    color: var(--color-text);
   }
 
   & > h1 {
     flex-grow: 1;
+    color: var(--color-text);
   }
 }
 
@@ -48,6 +61,7 @@
 
   & > video {
     height: 100%;
+    border-radius: 0.5rem;
   }
 }
 
@@ -67,7 +81,7 @@
 }
 
 .mic-toggle-label .mic-toggle-bg {
-  background: rgb(75 85 99);
+  background: var(--color-text-secondary);
   transition: background 200ms;
 }
 
@@ -78,6 +92,7 @@
 .mic-toggle-label .dot {
   left: 0.25rem;
   transition: left 200ms;
+  background-color: var(--color-text);
 }
 
 .mic-toggle-label:has(#mic-toggle:checked) .dot {
@@ -102,5 +117,14 @@
 
   & > .btn {
     font-size: 1.25rem;
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    border-radius: 0.5rem;
+    transition: background-color 200ms;
+  }
+
+  & > .btn:hover {
+    background-color: var(--color-primary-light);
   }
 }
+
