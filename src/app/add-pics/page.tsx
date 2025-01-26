@@ -2,8 +2,18 @@
 
 import { useEffect } from "react";
 import "./styles.css";
+import { useRouter } from "next/navigation";
+
+
 
 export default function Page() {
+
+  const router = useRouter(); // Initialize router
+
+  function handleimdone(){
+    router.push("/gallery");
+  }
+
   useEffect(() => {
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
 
@@ -44,15 +54,16 @@ export default function Page() {
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <button className="w-full rounded-lg btn btn-primary">I'm Done</button>
+        <button onClick={handleimdone} className="w-full rounded-lg btn btn-primary" >I'm Done</button>
       </div>
     </div>
   );
 }
 
-function handleAddPhoto() {
-  alert("yoop");
-}
+  function handleAddPhoto() {
+    console.log("yooP")
+  }
+  //GET the photo's id to put in the gallery?
 
 function handleMicToggle() {
   // here

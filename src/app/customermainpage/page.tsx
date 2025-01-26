@@ -52,7 +52,7 @@ export default function Home() {
 
         <nav className="space-y-4">
           {[
-            { title: "EMPLOYEE LOGIN", href: "/toren" },
+            { title: "EMPLOYEE LOGIN", href: "/flightAttendant" },
             { title: "Track your bags", href: "/track-bags" },
             { title: "I lost something", href: "/lost-items" },
             { title: "Wi-Fi and free entertainment", href: "/wifi" },
@@ -64,7 +64,7 @@ export default function Home() {
             { title: "General information", href: "/info" },
             { title: "Privacy policy", href: "/privacy" },
             { title: "Contact American", href: "/contact" },
-            { title: "Gallery testing", href: "/gallery" }, /*Change the location or take out */
+            { title: "Gallery testing", href: "/gallery" } /*Change the location or take out */
           ].map((item) => (
             <Link
               key={item.href}
