@@ -32,7 +32,7 @@ export default function StaffDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("unclaimed")
+  const [statusFilter, setStatusFilter] = useState("")
   const [flightFilter, setFlightFilter] = useState("")
   const debouncedSearch = useDebounce(searchTerm, 300)
   const router = useRouter()
@@ -71,7 +71,7 @@ export default function StaffDashboard() {
       item.flight.flightNumber.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
       item.seat.seatNumber.toLowerCase().includes(debouncedSearch.toLowerCase())
 
-    return searchMatch
+    return searchMatch;
   })
 
   if (loading) {
@@ -126,7 +126,7 @@ export default function StaffDashboard() {
               <Select
                 options={[
                   { label: 'All', value: '' },
-                  { label: 'Unclaimed', value: 'unclaimed'},
+                  { label: 'Unclaimed', value: 'unclaimed' },
                   { label: 'Claimed', value: 'claimed' },
                   { label: 'Shipped', value: 'shipped' },
                 ]}
