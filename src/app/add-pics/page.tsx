@@ -13,7 +13,6 @@ interface FormData {
 }
 
 export default function Page() {
-  const router = useRouter();
   const [flightNumber, setFlightNumber] = useState("\u2014");
   window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const [speechReg, setSpeechReg] = useState<SpeechRecognition>(new SpeechRecognition());
@@ -25,6 +24,12 @@ export default function Page() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter(); // Initialize router
+  
+  const handleimdone = () => {
+    router.push("/staff");
+  }
 
   function handleAddPhoto(event: React.MouseEvent<HTMLButtonElement>) {
     const addBtn = event.target as HTMLButtonElement;
@@ -192,7 +197,7 @@ export default function Page() {
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <button className="w-full rounded-lg btn btn-primary">I'm Done</button>
+        <button onClick={handleimdone} className="w-full rounded-lg btn btn-primary">I'm Done</button>
       </div>
     </div>
   );
