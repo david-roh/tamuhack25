@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import "./styles.css";
+import Link from 'next/link';
 
 interface FormData {
   itemName: string;
@@ -183,7 +183,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="root" style={{ background: "#f2f4fd" }}>
+    <div className="root">
       <div className="row-header">
         <a href="/flightAttendant" className="btn btn-neutral">&#x2B05; Back</a>
         <h1 className="text-2xl font-bold text-center">{flightNumber}</h1>
@@ -200,23 +200,14 @@ export default function Page() {
           </div>
           <div className="ml-3 text-gray-700 font-medium">Microphone</div>
         </label>
-        <div className="current-seat-num">
-          <input
-            type="text"
-            value={seatNum}
-            onChange={evt => setSeatNum(evt.target.value)}
-            onFocus={evt => {if (evt.target.value === "\u2014") {evt.target.value = "";}}}
-            onBlur={evt => {evt.target.value = evt.target.value.trim(); if (evt.target.value === "") {evt.target.value = "\u2014";}}} />
-        </div>
+        <div className="current-seat-num"><input type="text" value={seatNum} onChange={evt => setSeatNum(evt.target.value)} /></div>
       </div>
       <div className="row-btns">
         <button className="w-full rounded-lg btn btn-neutral">Delete Last Photo</button>
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <Link href="/staff" className="w-full h-full">
-          <button className="w-full h-full rounded-lg btn btn-primary">I'm Done</button>
-        </Link>
+        <button className="w-full rounded-lg btn btn-primary"><Link href={`/gallery?flightNumber=${flightNumber}`}>I'm Done</Link></button>
       </div>
     </div>
   );

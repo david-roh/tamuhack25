@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Flight validation schemas
 const flightSchema = z.object({
-  flightNumber: z.string().min(2).max(10),
+  flightNumber: z.string().min(0).max(10),
   originCode: z.string().length(3).toUpperCase(),
   destinationCode: z.string().length(3).toUpperCase(),
   departureTime: z.string().datetime(),
@@ -80,9 +80,9 @@ export const partialSeatSchema = z.object({
 });
 
 export const partialLostItemSchema = z.object({
-  flight: z.string().min(1).optional(),
-  seat: z.string().min(1).optional(),
-  itemName: z.string().min(1).max(255).optional(),
+  flight: z.string().min(0).optional(),
+  seat: z.string().min(0).optional(),
+  itemName: z.string().min(0).max(255).optional(),
   itemDescription: z.string().optional(),
   itemImageUrl: z.string().url().optional(),
   status: z.enum(['unclaimed', 'claimed', 'shipped']).optional(),
