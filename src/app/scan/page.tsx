@@ -24,6 +24,15 @@ export default function ScanPage() {
   useEffect(() => {
     const initializeCamera = async () => {
       try {
+        // Request camera permission with more flexible constraints
+        await navigator.mediaDevices.getUserMedia({ 
+          video: {
+            facingMode: 'environment',
+            width: { ideal: 1080 },
+            height: { ideal: 1080 }
+          } 
+        });
+        
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices
           .filter(device => device.kind === 'videoinput')
@@ -37,15 +46,63 @@ export default function ScanPage() {
           return;
         }
 
+        // Prefer back camera if available
+        const backCamera = videoDevices.find(device => 
+          device.label.toLowerCase().includes('back') || 
+          device.label.toLowerCase().includes('rear')
+        );
+        
         setCameras(videoDevices);
-        setSelectedCamera(videoDevices[0].deviceId);
-      } catch (err: any) {
+        setSelectedCamera(backCamera?.deviceId || videoDevices[0].deviceId);
+      } catch (err) {
+        if (err instanceof Error) {
+          if (err.name === 'OverconstrainedError') {
+            // Try again with minimal constraints
+            try {
+              await navigator.mediaDevices.getUserMedia({ video: true });
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              const videoDevices = devices
+                .filter(device => device.kind === 'videoinput')
+                .map(device => ({
+                  deviceId: device.deviceId,
+                  label: device.label || `Camera ${devices.indexOf(device) + 1}`
+                }));
+              if (videoDevices.length > 0) {
+                setCameras(videoDevices);
+                setSelectedCamera(videoDevices[0].deviceId);
+                setError('');
+                return;
+              }
+            } catch (retryErr) {
+              setError('Camera not compatible. Please try a different device.');
+            }
+          } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            setError('Camera access denied. Please grant permission to use the camera.');
+          } else if (err.name === 'NotFoundError') {
+            setError('No camera found on this device.');
+          } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+            setError('Camera is in use by another application.');
+          } else {
+            setError(`Camera error: ${err.message}`);
+          }
+        } else {
+          setError('Failed to initialize camera');
+        }
         console.error('Camera initialization error:', err);
-        setError(`Camera access error: ${err.message}`);
       }
     };
 
     initializeCamera();
+
+    // Cleanup function
+    return () => {
+      // Stop any active media tracks
+      navigator.mediaDevices?.getUserMedia({ video: true })
+        .then(stream => {
+          stream.getTracks().forEach(track => track.stop());
+        })
+        .catch(() => {});
+    };
   }, []);
 
   const handleScan = async (result: string | null) => {
@@ -109,26 +166,27 @@ export default function ScanPage() {
           </div>
           
           <div className="aspect-square w-full relative mb-4">
-            {selectedCamera ? (
+            {selectedCamera && !error ? (
               <Scanner
                 onScan={handleScanWrapper}
                 onError={handleError}
                 constraints={{
                   deviceId: selectedCamera,
-                  facingMode: 'environment'
+                  facingMode: 'environment',
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 }
                 }}
-                // containerStyle={{ borderRadius: '0.5rem' }} commented out didn't work for mine(Sarah)
+                classNames="rounded-lg overflow-hidden"
+                style={{ width: '100%', height: '100%' }}
               />
             ) : (
-              <p className="text-sm text-gray-500">Initializing camera...</p>
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+                <p className="text-sm text-gray-500">
+                  {error || 'Initializing camera...'}
+                </p>
+              </div>
             )}
           </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 mt-4">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
 
           {claimed && (
             <div className="mt-4">
