@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "./styles.css";
 import Link from 'next/link';
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FormData {
   itemName: string;
@@ -28,6 +29,8 @@ export default function Page() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [prevUpload, setPrevUpload] = useState();
+  const [showPopup, setShowPopup] = useState(false);
 
   // Initialize speech recognition in useEffect
   useEffect(() => {
@@ -101,6 +104,8 @@ export default function Page() {
               video.play();
               throw new Error(data.error || "Failed to submit item");
             }
+            console.log("NEW DATA -----", data);
+            setPrevUpload(data._id);
           }
           catch (error) {
             addBtn.disabled = false;
@@ -160,6 +165,21 @@ export default function Page() {
         setLoading(false);
       }
     };
+    const handleDeletePhoto = async (e: React.FormEvent) => {
+      console.log("PREVIOUS UPLOAD: ", prevUpload);
+      const response = await fetch(`/api/lost-items/${prevUpload}`, {
+        method: "DELETE"
+      });
+
+      if(!response.ok) {
+        // error with response
+
+      } else {
+        setShowPopup(true); // display popup for deleted photo --------------------------
+        setTimeout(() => setShowPopup(false), 3000); // Hide popup after 3 seconds
+
+      }
+    }
 
   useEffect(() => {
     // get flight number and makes sure not null
@@ -187,7 +207,20 @@ export default function Page() {
   }, []);
 
   return (
+    
     <div className="root">
+    <AnimatePresence>
+        {showPopup && (
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg mt-4"
+          >
+            Item has been deleted successfully.
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="row-header">
         <a href="/flightAttendant" className="btn btn-neutral">&#x2B05; Back</a>
         <h1 className="text-2xl font-bold text-center">{flightNumber}</h1>
@@ -207,7 +240,7 @@ export default function Page() {
         <div className="current-seat-num"><input type="text" value={seatNum} onChange={evt => setSeatNum(evt.target.value)} /></div>
       </div>
       <div className="row-btns">
-        <button className="w-full rounded-lg btn btn-neutral">Delete Last Photo</button>
+        <button className="w-full rounded-lg btn btn-neutral" onClick={handleDeletePhoto}>Delete Last Photo</button>
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">

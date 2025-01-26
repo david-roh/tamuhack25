@@ -125,7 +125,7 @@ export default function FlightInputPage(): JSX.Element {
                 >
                   Cancel
                 </motion.button>
-                <Link href={handleConfirm()}>
+                {flightDetails !== 'Unknown flight' && <Link href={handleConfirm()}>
                   <motion.button
                     className="px-5 py-2 bg-[#0078D7] text-white rounded-xl hover:bg-[#005A9C] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
                     whileHover={{ scale: 1.05 }}
@@ -133,7 +133,7 @@ export default function FlightInputPage(): JSX.Element {
                   >
                     Confirm
                   </motion.button>
-                </Link>
+                </Link>}
               </div>
             </motion.div>
           </motion.div>
