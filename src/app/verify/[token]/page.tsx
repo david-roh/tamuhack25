@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
+import html2canvas from 'html2canvas';
 
 interface LostItem {
   _id: string;
@@ -33,23 +34,53 @@ interface LostItem {
 
 function ShippingLabel({ shipping }: { shipping: NonNullable<LostItem['shipping']> }) {
   const labelRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
-  const downloadLabel = () => {
-    if (!labelRef.current) return;
+  const downloadLabel = async () => {
+    if (!labelRef.current || downloading) return;
     
-    const content = labelRef.current;
-    const canvas = document.createElement('canvas');
-    canvas.width = content.offsetWidth * 2;
-    canvas.height = content.offsetHeight * 2;
-    
-    const html2canvas = require('html2canvas');
-    html2canvas(content, { scale: 2 }).then((canvas: HTMLCanvasElement) => {
-      const imageData = canvas.toDataURL('image/png');
+    try {
+      setDownloading(true);
+      const content = labelRef.current;
+      
+      const canvas = await html2canvas(content, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        allowTaint: true,
+        foreignObjectRendering: true,
+        removeContainer: true
+      });
+
+      // Convert to blob instead of using toDataURL
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob as Blob);
+        }, 'image/png');
+      });
+
+      // Create URL from blob
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.download = 'shipping-label.png';
-      link.href = imageData;
+      const fileName = `shipping-label-${shipping.trackingNumber || 'untracked'}.png`;
+      
+      link.download = fileName;
+      link.href = url;
+      document.body.appendChild(link);
       link.click();
-    });
+      document.body.removeChild(link);
+      
+      // Clean up the blob URL
+      URL.revokeObjectURL(url);
+      
+      toast.success('Shipping label downloaded successfully');
+    } catch (error) {
+      console.error('Error downloading shipping label:', error);
+      toast.error('Failed to download shipping label');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const generateBarcode = () => {
@@ -163,14 +194,31 @@ function ShippingLabel({ shipping }: { shipping: NonNullable<LostItem['shipping'
 
       <button
         onClick={downloadLabel}
-        className="w-full bg-gray-900 text-white py-2 px-4 rounded-lg 
-          hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
+        disabled={downloading}
+        className={`w-full py-2 px-4 rounded-lg 
+          flex items-center justify-center gap-2 transition-colors duration-200
+          ${downloading 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-gray-900 hover:bg-gray-800'
+          } text-white`}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-        </svg>
-        Download Shipping Label
+        {downloading ? (
+          <>
+            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Generating Label...
+          </>
+        ) : (
+          <>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download Shipping Label
+          </>
+        )}
       </button>
     </div>
   );
