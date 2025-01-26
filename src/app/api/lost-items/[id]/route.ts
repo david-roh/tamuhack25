@@ -56,7 +56,9 @@ export async function GET(
     }
 
     console.log('Found item:', lostItem);
-    return NextResponse.json({ item: lostItem });
+    
+    // Return the item directly without wrapping it
+    return NextResponse.json(lostItem);
   } catch (error) {
     console.error('Error fetching lost item:', error);
     return NextResponse.json(
