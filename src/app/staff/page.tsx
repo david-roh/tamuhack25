@@ -89,7 +89,7 @@ export default function StaffDashboard() {
           <h1 className="text-2xl font-bold text-white">Lost Items Dashboard</h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 bg-black/20 p-2 rounded-lg">
             <Button asChild variant="outline" className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/10 py-2 px-1.5 flex items-center">
-              <Link href="/customermainpage" className="flex items-center text-lg font-normal">
+              <Link href="/staffTeam" className="flex items-center text-lg font-normal">
                 <Home className="h-6 w-6 mr-2" />
                 Home
               </Link>
