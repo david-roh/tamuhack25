@@ -32,7 +32,7 @@ export default function StaffDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("Unclaimed")
+  const [statusFilter, setStatusFilter] = useState("unclaimed")
   const [flightFilter, setFlightFilter] = useState("")
   const debouncedSearch = useDebounce(searchTerm, 300)
   const router = useRouter()
@@ -125,6 +125,7 @@ export default function StaffDashboard() {
               <label className="block text-sm font-medium text-white mb-1">Status</label>
               <Select
                 options={[
+                  { label: 'All', value: '' },
                   { label: 'Unclaimed', value: 'unclaimed'},
                   { label: 'Claimed', value: 'claimed' },
                   { label: 'Shipped', value: 'shipped' },
@@ -180,8 +181,37 @@ export default function StaffDashboard() {
                   </p>
                   <p>
                     <span className="font-medium text-gray-300">Collection Code:</span>{" "}
-                    <span className="font-mono bg-black/30 px-2 py-1 rounded text-[#4A90E2]">
-                      {item.collectionCode}
+                    <span 
+                      className="font-mono bg-black/30 px-2 py-1 rounded relative group cursor-pointer 
+                        inline-flex items-center"
+                    >
+                      <span className="relative">
+                        <span className="absolute inset-0 bg-black/30 z-10 opacity-100 group-hover:opacity-0 transition-opacity duration-200">
+                          ••••••
+                        </span>
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#4A90E2]">
+                          {item.collectionCode}
+                        </span>
+                      </span>
+                      <svg 
+                        className="w-4 h-4 ml-1 text-gray-400 opacity-100 group-hover:opacity-0 transition-opacity duration-200" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" 
+                        />
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" 
+                        />
+                      </svg>
                     </span>
                   </p>
                 </div>
