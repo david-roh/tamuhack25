@@ -27,10 +27,12 @@ export default function Page() {
     seatNum: "",
     photo: null,
   });
+  const [popupMessage, setPopupMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [prevUpload, setPrevUpload] = useState();
   const [showPopup, setShowPopup] = useState(false);
+  const [popupColor, setPopupColor] = useState("");
 
   // Initialize speech recognition in useEffect
   useEffect(() => {
@@ -106,6 +108,10 @@ export default function Page() {
               video.play();
               throw new Error(data.error || "Failed to submit item");
             }
+            setPopupMessage("Item was added");
+            setPopupColor("bg-green-500")
+            setShowPopup(true); // display popup for deleted photo --------------------------
+            setTimeout(() => setShowPopup(false), 3000); 
             console.log("NEW DATA -----", data);
             setPrevUpload(data._id);
           }
@@ -132,41 +138,6 @@ export default function Page() {
     }
   }
   
-  const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setLoading(true);
-      setError('');
-  
-      try {
-        const formDataToSend = new FormData();
-        
-        // Add all form fields to FormData
-        Object.entries(formData).forEach(([key, value]) => {
-          if (value) {
-            formDataToSend.append(key, value);
-          }
-        });
-  
-        const response = await fetch('/api/lost-items', {
-          method: 'POST',
-          body: formDataToSend,
-        });
-  
-        const data = await response.json();
-  
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to submit item');
-        }
-  
-        // toast.success('Item submitted successfully!');
-        router.push('/staff');
-      } catch (err: any) {
-        // toast.error(err.message || 'Failed to submit item');
-        setError(err.message || 'Failed to submit item');
-      } finally {
-        setLoading(false);
-      }
-    };
     const handleDeletePhoto = async (e: React.FormEvent) => {
       console.log("PREVIOUS UPLOAD: ", prevUpload);
       const response = await fetch(`/api/lost-items/${prevUpload}`, {
@@ -175,8 +146,14 @@ export default function Page() {
 
       if(!response.ok) {
         // error with response
+        setPopupMessage("Item was not found");
+        setPopupColor("bg-red-500")
+        setShowPopup(true); // display popup for deleted photo --------------------------
+        setTimeout(() => setShowPopup(false), 3000); // Hide popup after 3 seconds
 
       } else {
+        setPopupMessage("Item has been deleted successfully");
+        setPopupColor("bg-green-500")
         setShowPopup(true); // display popup for deleted photo --------------------------
         setTimeout(() => setShowPopup(false), 3000); // Hide popup after 3 seconds
 
@@ -209,20 +186,21 @@ export default function Page() {
   }, []);
 
   return (
-    
-    <div className="root bg-green-500 text-white">
+    <>
       <AnimatePresence>
-          {showPopup && (
-            <motion.div
-              initial={{ y: -50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -50, opacity: 0 }}
-              className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg mt-4"
-            >
-              Item has been deleted successfully.
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {showPopup && (
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -50, opacity: 0 }}
+          className={`fixed top-0 left-1/2 ${popupColor} text-white px-6 py-3 rounded-lg shadow-lg mt-4`}
+          style={{transform: "translate(-50%)"}}
+        >
+          { popupMessage }
+        </motion.div>
+      )}
+    </AnimatePresence>
+    <div className="root">
       <div className="row-header">
         <a href="/flightAttendant" className="btn btn-neutral">&#x2B05; Back</a>
         <h1 className="text-2xl font-bold text-center">{flightNumber}</h1>
@@ -256,6 +234,7 @@ export default function Page() {
         <button className="w-full rounded-lg btn donebtn"><Link href={`/gallery?flightNumber=${flightNumber}`}>I'm Done</Link></button>
       </div>
     </div>
+    </>
   );
 }
 
