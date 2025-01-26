@@ -67,9 +67,12 @@ export default function Page() {
 
   function handleAddPhoto(event: React.MouseEvent<HTMLButtonElement>) {
     const addBtn = event.target as HTMLButtonElement;
-    addBtn.disabled = true;
-
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
+    addBtn.disabled = true;
+    video.pause();
+    document.querySelector(".root > .row-cam")?.classList.remove("cam-flash");
+    window.requestAnimationFrame(() => document.querySelector(".root > .row-cam")?.classList.add("cam-flash"));
+
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -97,15 +100,18 @@ export default function Page() {
 
             if (!response.ok) {
               addBtn.disabled = false;
+              video.play();
               throw new Error(data.error || "Failed to submit item");
             }
           }
           catch (error) {
             addBtn.disabled = false;
+            video.play();
             throw new Error("Failed to submit item");
           }
 
           addBtn.disabled = false;
+          video.play();
         }
       }, "image/jpeg");
     }
