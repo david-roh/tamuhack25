@@ -133,13 +133,13 @@ export default function Page() {
       if (result.isFinal) {
         const transcript = result[0].transcript
           .replace(/\s/g, "")
-          .replace(/[^0-9LR]/g, "");
+          .replace(/[^0-9A-Z]/g, "");
         console.log(`Speech recognized: ${transcript}`);
-        if (!/\d+[LR]$/.test(transcript)) {
+        if (!/\d+[A-Z]$/.test(transcript)) {
           console.log("Invalid transcript.");
           return;
         }
-        const matches = transcript.match(/\d+[LR]$/);
+        const matches = transcript.match(/\d+[A-Z]$/);
         if (matches !== null) {
           const seat = matches[0];
           console.log(`Seats recognized: ${seat}`);
