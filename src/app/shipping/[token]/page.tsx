@@ -83,7 +83,7 @@ export default function ShippingPage() {
         }
 
         // Check if item exists and has status
-        if (!data.item || !data.item.status) {
+        if (!data || !data.status) {
           console.error('Invalid item data:', data);
           toast.error('Invalid item token');
           router.push('/staff');
@@ -91,17 +91,17 @@ export default function ShippingPage() {
         }
 
         // Log the item status
-        console.log('Item status:', data.item.status);
+        console.log('Item status:', data.status);
 
         // Only redirect for specific statuses
-        if (data.item.status === 'claimed') {
+        if (data.status === 'claimed') {
           console.log('Item is already claimed, redirecting...');
           toast.error('This item has already been claimed');
           router.push('/staff');
           return;
         }
 
-        if (data.item.status === 'shipped') {
+        if (data.status === 'shipped') {
           console.log('Item is already shipped, redirecting...');
           toast.error('This item has already been shipped');
           router.push('/staff');

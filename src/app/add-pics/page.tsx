@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import "./styles.css";
 
 interface FormData {
@@ -171,7 +172,7 @@ export default function Page() {
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       .then(stream => {
         video.srcObject = stream;
         video.onloadedmetadata = () => {
@@ -187,7 +188,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="root">
+    <div className="root" style={{ background: "#f2f4fd" }}>
       <div className="row-header">
         <a href="/flightAttendant" className="btn btn-neutral">&#x2B05; Back</a>
         <h1 className="text-2xl font-bold text-center">{flightNumber}</h1>
@@ -204,7 +205,14 @@ export default function Page() {
           </div>
           <div className="ml-3 text-gray-700 font-medium">Microphone</div>
         </label>
-        <div className="current-seat-num">{seatNum}</div>
+        <div className="current-seat-num">
+          <input
+            type="text"
+            value={seatNum}
+            onChange={evt => setSeatNum(evt.target.value)}
+            onFocus={evt => {if (evt.target.value === "\u2014") {evt.target.value = "";}}}
+            onBlur={evt => {evt.target.value = evt.target.value.trim(); if (evt.target.value === "") {evt.target.value = "\u2014";}}} />
+        </div>
       </div>
       <div className="row-btns">
         <button className="w-full rounded-lg btn btn-neutral">Delete Last Photo</button>
@@ -212,15 +220,17 @@ export default function Page() {
       </div>
       <div className="row-done">
         <button onClick={handleimdone} className="w-full rounded-lg btn btn-primary">I'm Done</button>
+
       </div>
     </div>
   );
 }
 
-// // Add these to fix TypeScript errors
-// declare global {
-//   interface Window {
-//     SpeechRecognition?: any;
-//     webkitSpeechRecognition?: any;
-//   }
-// }
+
+// Add these to fix TypeScript errors
+declare global {
+  interface Window {
+    SpeechRecognition?: any;
+    webkitSpeechRecognition?: any;
+  }
+}
