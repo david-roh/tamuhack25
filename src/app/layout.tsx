@@ -24,10 +24,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/app.webmanifest" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Service Worker registration
+              if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("sw.js").then(() => console.log("Service Worker registered."));
+              } else {
+                console.warn("Unable to register Service Worker");
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
