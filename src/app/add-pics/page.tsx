@@ -193,8 +193,7 @@ export default function Page() {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -50, opacity: 0 }}
-          className={`fixed top-0 left-1/2 ${popupColor} text-white px-6 py-3 rounded-lg shadow-lg mt-4`}
-          style={{transform: "translate(-50%)"}}
+          className={`fixed top-0 left-1/2 text-red !transform !-translate-x-1/2 ${popupColor} text-white px-6 py-3 rounded-lg shadow-lg mt-4`}
         >
           { popupMessage }
         </motion.div>
