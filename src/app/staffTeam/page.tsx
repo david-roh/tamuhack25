@@ -37,7 +37,7 @@ export default function FlightInputPage(): JSX.Element {
         backgroundSize: 'cover', // Ensures the image covers the div
         backgroundPosition: 'center', // Centers the image
         backgroundRepeat: 'no-repeat', // Prevents repeating
-        height: '500px', // Adjust as needed
+        height: '100vh', // Adjust as needed
         width: '100%', // Full width
       }}
       className="h-screen flex flex-col justify-center items-center bg-[#1C2632] relative overflow-hidden"
@@ -60,18 +60,18 @@ export default function FlightInputPage(): JSX.Element {
         
         <div className="flex gap-[10px]">
             <motion.button
-            onClick={handleSubmitclerk}
-            className="w-full bg-[#0078D7] text-white py-4 rounded-xl hover:bg-[#005A9C] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.95 }}
+              onClick={handleSubmitclerk}
+              className="w-full bg-[#0078D7] text-white py-4 rounded-xl hover:bg-[#005A9C] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
             >
             Clerk
             </motion.button>
             <motion.button
-            onClick={handleSubmitstaff}
-            className="w-full bg-[#0078D7] text-white py-4 rounded-xl hover:bg-[#005A9C] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.95 }}
+              onClick={handleSubmitstaff}
+              className="w-full bg-[#0078D7] text-white py-4 rounded-xl hover:bg-[#005A9C] transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
             >
             Flight Attendant
             </motion.button>
