@@ -8,7 +8,7 @@ export default function Page() {
   useEffect(() => {
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
 
-    // get flight number 
+    // get flight number and makes sure not null
     const params = new URLSearchParams(window.location.search); 
     const flightNumber = params.get("flightNumber");
     if(flightNumber)
@@ -28,6 +28,9 @@ export default function Page() {
 
   return (
     <div className="root">
+        <div>
+            <b className="flex justify-center text-xl items-center text-black py-4">FlightNumber: {flightNumber}</b>
+        </div>
       <div className="row-cam">
         <video id="cam-viewfinder" className="cam-viewfinder"></video>
       </div>
