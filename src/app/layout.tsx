@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href="/app.webmanifest" crossorigin="use-credentials" />
+        <link rel="manifest" href="/app.webmanifest" crossOrigin="use-credentials" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
