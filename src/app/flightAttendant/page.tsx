@@ -9,9 +9,42 @@ import Link from 'next/link';
 export default function FlightInputPage(): JSX.Element {
   const [flightNumber, setFlightNumber] = useState<string>('');
   const [isPopupVisible, setIsPopupVisible] = useState<boolean>(false);
+  const [flightDetails, setFlightDetails] = useState<string>('');
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = async (e: ChangeEvent<HTMLInputElement>): Promise<void> => {
     setFlightNumber(e.target.value);
+    const currentDate = new Date().toISOString().split('T')[0];
+    const res = await fetch(`https://flight-engine-dr4l.onrender.com/flights?date=${currentDate}`);
+    const obj = await res.json();
+    // Add guaranteed test values
+    obj.unshift(
+      {
+        flightNumber: "123",
+        origin: {
+          code: "LHR",
+          city: "London"
+        },
+        destination: {
+          code: "CDG",
+          city: "Paris"
+        }
+      },
+      {
+        flightNumber: "456",
+        origin: {
+          code: "CDG",
+          city: "Paris"
+        },
+        destination: {
+          code: "LHR",
+          city: "London"
+        }
+      }
+    );
+    // AA1234 -> 1234
+    const idx = obj.findIndex((element: any) => String(element.flightNumber) === e.target.value.slice(2));
+    if (idx === -1) setFlightDetails('Unknown flight');
+    else setFlightDetails(`${obj[idx].origin.code} \u2192 ${obj[idx].destination.code} (${obj[idx].origin.city} \u2192 ${obj[idx].destination.city})`);
   };
 
   const handleSubmit = (): void => {
@@ -53,7 +86,7 @@ export default function FlightInputPage(): JSX.Element {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-4/5 max-w-md">
             <h2 className="text-xl font-bold mb-4" style={{ color: '#36495A' }}>Confirm Flight Number</h2>
-            <p className="mb-6" style={{ color: '#36495A' }}>Is this the correct flight number? <strong>{flightNumber}</strong></p>
+            <p className="mb-6" style={{ color: '#36495A' }}>Is this the correct flight number? <strong>{flightNumber}</strong><br /><span>{flightDetails}</span></p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={handleCancel}
