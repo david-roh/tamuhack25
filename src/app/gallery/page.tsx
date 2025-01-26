@@ -109,9 +109,9 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen bg-[#1C2632] text-white">
-      <div className="p-4">
+      <div className="flex flex-col h-screen p-4">
         <header className="flex items-center gap-4 mb-6">
-          <Link href="customermainpage" className="text-[#4A90E2]"> {/* LOOK HERE: LEFT ARROW Link to the previous page */}
+          <Link href="customermainpage" className="text-[#4A90E2]">
             <ArrowLeft className="h-6 w-6" />
           </Link>
           <h1 className="text-xl font-semibold">{items.length} lost items</h1>
@@ -122,7 +122,7 @@ export default function Gallery() {
         </div>}
 
         {/* Scrollable Gallery */}
-        <ScrollArea className="h-[600px] rounded-md border border-gray-800">
+        <ScrollArea className="flex-1 rounded-md border border-gray-800">
           <div className="grid grid-cols-2 gap-4 p-4">
             {items.map((item) => (
               <div key={item._id} className="space-y-2">
@@ -143,7 +143,7 @@ export default function Gallery() {
         </ScrollArea>
 
         {/* Submit Photos Button */}
-        <Button onClick={handleSubmitPhotos} className="w-full mt-4 bg-[#4A90E2] hover:bg-[#4A90E2]/90">
+        <Button onClick={handleSubmitPhotos} className="w-full py-4 mt-4 bg-[#4A90E2] hover:bg-[#4A90E2]/90 sticky bottom-4">
           Submit Photos
         </Button>
       </div>
