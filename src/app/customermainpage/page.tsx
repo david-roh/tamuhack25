@@ -1,3 +1,5 @@
+'use client';
+
 import { Bell, ChevronRight, MessageSquare, Clock, Search, Plane } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -76,12 +78,6 @@ export default function Home() {
             </Link>
           ))}
         </nav>
-        <Link
-          href="/page2"
-          className="inline-flex h-10 items-center justify-center rounded-md bg-black px-8 text-sm font-medium text-white shadow transition-colors hover:bg-black/90"
-        >
-          Deploy now
-        </Link>
       </div>
     </div>
   )
