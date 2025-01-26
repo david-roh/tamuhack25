@@ -33,7 +33,7 @@ export const Select: React.FC<SelectProps> = ({ options, value, onChange, placeh
 
       {/* Options Dropdown */}
       {isOpen && (
-        <ul className="absolute z-10 w-full bg-gray-800 border border-gray-300 rounded-md mt-1 shadow-lg">
+        <ul className="absolute z-10 w-full bg-gray-800 border border-gray-300 rounded-md mt-1 shadow-lg text-white" >
           {options.map((option) => (
             <li
               key={option.value}

@@ -32,7 +32,7 @@ export default function StaffDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("unclaimed")
+  const [statusFilter, setStatusFilter] = useState("")
   const [flightFilter, setFlightFilter] = useState("")
   const debouncedSearch = useDebounce(searchTerm, 300)
   const router = useRouter()
