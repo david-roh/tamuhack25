@@ -143,7 +143,7 @@ export default function Gallery() {
         </ScrollArea>
 
         {/* Submit Photos Button */}
-        <Button onClick={handleSubmitPhotos} className="w-full py-4 mt-4 bg-[#4A90E2] hover:bg-[#4A90E2]/90 sticky bottom-4">
+        <Button onClick={handleSubmitPhotos} className="w-full py-4 mt-4 bg-[#4A90E2] hover:bg-[#4A90E2]/90 sticky bottom-4 rounded-lg">
           Submit Photos
         </Button>
       </div>

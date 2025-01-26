@@ -64,7 +64,7 @@ export default function LostItems() {
           </div>
 
         {/* Submit Photos Button */}
-        <Button onClick={handleSubmitForm} className="w-full mt-4 bg-[#4A90E2] hover:bg-[#4A90E2]/90">
+        <Button onClick={handleSubmitForm} className="w-full mt-4 bg-[#4A90E2] hover:bg-[#4A90E2]/90 rounded-lg">
           Submit Form
         </Button>
           
