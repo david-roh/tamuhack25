@@ -54,7 +54,7 @@ export default function Home() {
 
         <nav className="space-y-4">
           {[
-            { title: "EMPLOYEE LOGIN", href: "/flightAttendant" },
+            { title: "LOST ITEM[Employees only]", href: "/staffTeam" },
             { title: "Track your bags", href: "/track-bags" },
             { title: "I lost something", href: "/lost-items" },
             { title: "Wi-Fi and free entertainment", href: "/wifi" },

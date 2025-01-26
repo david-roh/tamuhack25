@@ -204,7 +204,7 @@ export default function Page() {
             <div className="block w-14 h-8 rounded-full mic-toggle-bg"></div>
             <div className="dot absolute top-1 bg-white w-6 h-6 rounded-full"></div>
           </div>
-          <div className="ml-3 text-gray-700 font-medium">Microphone</div>
+          <div className="ml-3 text-gray-200 font-medium">Microphone</div>
         </label>
         <div className="current-seat-num"><input type="text" value={seatNum} onChange={evt => setSeatNum(evt.target.value)} /></div>
       </div>

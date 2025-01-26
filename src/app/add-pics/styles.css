@@ -1,6 +1,7 @@
 :root {
   --color-primary: #4a90e2;
   --color-primary-light: #6ba5e7;
+  --color-primary-lighter: rgb(170, 189, 210);
   --color-primary-verylight: rgba(74, 144, 226, 0.2);
   --color-background: #1c2632;
   --color-surface: rgba(255, 255, 255, 0.1);
@@ -110,8 +111,7 @@
 }
 
 .mic-toggle-label .mic-toggle-bg {
-  background: var(--color-primary); 
-  /* changes background of mike toggle to blue */
+  background: var(--color-primary-lighter);
   transition: background 200ms;
 }
 
