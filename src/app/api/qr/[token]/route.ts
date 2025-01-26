@@ -9,11 +9,10 @@ export async function GET(
   { params }: { params: { token: string } }
 ) {
   try {
-    // Connect to database first
     await dbConnect();
 
-    // Get token from params
-    const token = String(params.token);
+    // Await the params object before destructuring
+    const { token } = await params;
 
     // Find the lost item and populate references
     const lostItem = await LostItem.findOne({ claimToken: token })
@@ -51,7 +50,9 @@ export async function POST(
   try {
     await dbConnect();
     const { verificationCode } = await req.json();
-    const token = String(params.token);
+    
+    // Await the params object before destructuring
+    const { token } = await params;
     
     const lostItem = await LostItem.findOne({ claimToken: token });
 

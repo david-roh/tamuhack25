@@ -27,7 +27,7 @@ export async function sendEmail(
         if (!email || !flight) throw new Error('Missing required data for item-found email');
         
         const qrCodeUrl = await generateQRCode(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/qr/${lostItem.claimToken}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/qr/${lostItem.claimToken}`,
           {
             width: 400,
             margin: 4,

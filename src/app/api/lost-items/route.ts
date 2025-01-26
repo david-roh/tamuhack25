@@ -116,9 +116,9 @@ export async function POST(req: Request) {
       claimToken,
     });
 
-    // Generate QR code using the claim token - remove /api from URL
+    // Generate QR code using the claim token
     const qrCodeUrl = await generateQRCode(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/qr/${claimToken}`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/qr/${claimToken}`,
       {
         width: 400,
         margin: 4,
@@ -210,9 +210,16 @@ export async function GET(req: Request) {
       .populate('seat')
       .sort({ createdAt: -1 });
 
+    // Include claimToken in the response
+    const itemsWithUrls = items.map(item => ({
+      ...item.toObject(),
+      verifyUrl: `/verify/${item.claimToken}`,
+      qrCodeUrl: `/api/qr/${item.claimToken}`
+    }));
+
     // Apply search filter if provided
     const filteredItems = search
-      ? items.filter(item =>
+      ? itemsWithUrls.filter(item =>
           [
             item.itemName,
             item.itemDescription,
@@ -222,7 +229,7 @@ export async function GET(req: Request) {
             field?.toLowerCase().includes(search.toLowerCase())
           )
         )
-      : items;
+      : itemsWithUrls;
 
     return NextResponse.json(filteredItems);
   } catch (error) {

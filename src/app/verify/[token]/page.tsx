@@ -23,7 +23,7 @@ interface LostItem {
 }
 
 export default function VerifyPage() {
-  const { token } = useParams();
+  const params = useParams();
   const [item, setItem] = useState<LostItem | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');
@@ -31,25 +31,28 @@ export default function VerifyPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchItemDetails();
-  }, [token]);
+    const fetchItem = async () => {
+      try {
+        const res = await fetch(`/api/qr/${params.token}`, {
+          cache: 'no-store'
+        });
 
-  const fetchItemDetails = async () => {
-    try {
-      const response = await fetch(`/api/qr/${token}`);
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error);
+        if (!res.ok) {
+          throw new Error('Failed to fetch item');
+        }
+
+        const data = await res.json();
+        setItem(data);
+      } catch (error) {
+        console.error('Error fetching item:', error);
+        setError('Failed to fetch item details');
+      } finally {
+        setLoading(false);
       }
-      
-      setItem(data.item);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch item details');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchItem();
+  }, [params.token]);
 
   const handleVerify = async () => {
     try {
@@ -57,7 +60,7 @@ export default function VerifyPage() {
       setSuccess('');
       setLoading(true);
 
-      const response = await fetch(`/api/qr/${token}`, {
+      const response = await fetch(`/api/qr/${params.token}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +75,7 @@ export default function VerifyPage() {
       }
 
       setSuccess('Item verified and marked as collected!');
-      setItem(data.item);
+      item.item = data.item;
     } catch (err: any) {
       setError(err.message || 'Verification failed');
     } finally {

@@ -4,7 +4,7 @@ import Flight from '@/models/Flight';
 import Seat from '@/models/Seat';
 import LostItem from '@/models/LostItem';
 import QRCode from 'qrcode';
-import { generateToken } from "@/lib/utils";
+import { generateToken } from "@/lib/token";
 
 // Fix error typing
 interface SeedError extends Error {
@@ -69,7 +69,7 @@ export async function POST() {
       seats.push(...flightSeats);
     }
 
-    // Create sample lost items
+    // Create sample lost items with claim tokens
     const lostItems = await LostItem.create([
       {
         itemName: 'Dell XPS Laptop',
@@ -79,7 +79,8 @@ export async function POST() {
         flight: flights[0]._id,
         seat: seats[0]._id,
         foundAt: new Date(),
-        collectionCode: '123456'
+        collectionCode: '123456',
+        claimToken: generateToken(),
       },
       {
         itemName: 'Nike Backpack',
@@ -89,7 +90,8 @@ export async function POST() {
         flight: flights[0]._id,
         seat: seats[1]._id,
         foundAt: new Date(),
-        collectionCode: '789012'
+        collectionCode: '789012',
+        claimToken: generateToken(),
       },
       {
         itemName: 'Folding Umbrella',
@@ -100,7 +102,8 @@ export async function POST() {
         seat: seats[3]._id,
         foundAt: new Date(),
         claimedAt: new Date(),
-        collectionCode: '345678'
+        collectionCode: '345678',
+        claimToken: generateToken(),
       }
     ]);
 
@@ -109,7 +112,7 @@ export async function POST() {
       lostItems
         .filter(item => item.status === 'unclaimed')
         .map(async (item) => {
-          const qrUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/qr/${item._id}`;
+          const qrUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/qr/${item.claimToken}`;
           const qrDataUrl = await QRCode.toDataURL(qrUrl);
           return {
             itemName: item.itemName,

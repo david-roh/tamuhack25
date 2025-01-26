@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useRouter } from 'next/navigation';
 
 interface LostItem {
   _id: string;
@@ -19,6 +20,7 @@ interface LostItem {
     seatNumber: string;
   };
   createdAt: string;
+  claimToken: string;
 }
 
 export default function StaffDashboard() {
@@ -29,6 +31,7 @@ export default function StaffDashboard() {
   const [statusFilter, setStatusFilter] = useState('unclaimed');
   const [flightFilter, setFlightFilter] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
+  const router = useRouter();
 
   useEffect(() => {
     fetchItems();
@@ -65,6 +68,10 @@ export default function StaffDashboard() {
 
     return searchMatch;
   });
+
+  const handleViewDetails = (item: LostItem) => {
+    router.push(`/verify/${item.claimToken}`);
+  };
 
   if (loading) {
     return (
@@ -184,7 +191,7 @@ export default function StaffDashboard() {
                   </div>
                   <div className="mt-4 flex justify-between items-center">
                     <Link
-                      href={`/verify/${item._id}`}
+                      href={`/verify/${item.claimToken}`}
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
                       View Details →
