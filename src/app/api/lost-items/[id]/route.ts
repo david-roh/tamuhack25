@@ -34,36 +34,44 @@ export async function PATCH(
 ) {
   try {
     await dbConnect();
+    console.log("Hit this patch endpoint")
     const body = await req.json();
+    console.log("Body", body)
     let updateData = { ...body };
 
     // If new image is provided, upload it
-    if (body.image) {
-      // Get the current item to delete old image if exists
-      const currentItem = await LostItem.findById(params.id);
-      if (currentItem?.itemImageUrl) {
-        await deleteImage(currentItem.itemImageUrl);
-      }
+    // if (body.image) {
+    //   // Get the current item to delete old image if exists
+    //   const currentItem = await LostItem.findById(body._id);
+    //   if (currentItem?.itemImageUrl) {
+    //     await deleteImage(currentItem.itemImageUrl);
+    //   }
 
-      // Upload new image
-      const imageUrl = await uploadImage(body.image);
-      updateData.itemImageUrl = imageUrl;
-      delete updateData.image;
-    }
+    //   // Upload new image
+    //   const imageUrl = await uploadImage(body.image);
+    //   updateData.itemImageUrl = imageUrl;
+    //   delete updateData.image;
+    // }
 
     const validation = await validateRequest(
       { ...req, json: () => Promise.resolve(updateData) },
       partialLostItemSchema
     );
-    if (!validation.success) {
+    if (!validation.success) { // make sure items have names and follow schema guidelines defined by partialLostItemSchema
+      console.log("No Validation")
+      console.log(validation.error)
+      console.log(updateData);
+      console.log("--------------------------------------------------------------------------------------------------------")
       return validation.error;
     }
-    
+
+    console.log(body);
+
     const item = await LostItem.findByIdAndUpdate(
-      params.id,
+      body._id,
       { ...validation.data },
       { new: true, runValidators: true }
-    ).populate('flight').populate('seat');
+    )
 
     if (!item) {
       return NextResponse.json(
@@ -72,8 +80,10 @@ export async function PATCH(
       );
     }
 
+    console.log("JSON WORKED ------------------")
     return NextResponse.json(item);
   } catch (error: any) {
+    console.log("JSON DIDN'T WORK ---------------------------")
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

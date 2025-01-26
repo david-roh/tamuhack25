@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,30 +15,92 @@ interface Photo {
   caption: string;
 }
 
+interface LostItem {
+  _id: string;
+  itemName: string;
+  itemDescription: string;
+  itemImageUrl?: string;
+  status: string;
+  collectionCode: string;
+  flight: {
+    flightNumber: string;
+    originCode: string;
+    destinationCode: string;
+  };
+  seat: {
+    seatNumber: string;
+    customerEmail?: string;
+  };
+}
+
 export default function Gallery() {
-  const router = useRouter(); // Initialize router
+  const router = useRouter(); // Initialize route
+  const [items, setItems] = useState<LostItem[]>([]);
+  // reference using http://localhost:3000/gallery?flightNumber=1234
+
+  useEffect(() => {
+      const fetchItems = async () => {
+          const params = new URLSearchParams(window.location.search); 
+          const fNum = params.get("flightNumber");
+          console.log("Params flightNumber: ", fNum);
+          const res = await fetch(`/api/lost-items-flightNumber/${fNum}`);
+  
+          if (!res.ok) {
+            throw new Error('Failed to fetch item');
+          }
+  
+          const data = await res.json();
+          console.log(data)
+          setItems(data);
+      };
+  
+      fetchItems();
+    }, []);
 
   // Photo array; will be updated dynamically in production
-  const [photos, setPhotos] = useState<Photo[]>([
-    { id: "1", url: "/placeholder.svg", caption: "Black Android phone" },
-    { id: "2", url: "/placeholder.svg", caption: "LLM caption" },
-    { id: "3", url: "/placeholder.svg", caption: "Item description" },
-    { id: "4", url: "/placeholder.svg", caption: "Another description" },
-    { id: "5", url: "/placeholder.svg", caption: "Sample item" },
-    { id: "6", url: "/placeholder.svg", caption: "Example caption" },
-  ])
+  // const [photos, setPhotos] = useState<Photo[]>([
+  //   { id: "1", url: "/placeholder.svg", caption: "Black Android phone" },
+  //   { id: "2", url: "/placeholder.svg", caption: "LLM caption" },
+  //   { id: "3", url: "/placeholder.svg", caption: "Item description" },
+  //   { id: "4", url: "/placeholder.svg", caption: "Another description" },
+  //   { id: "5", url: "/placeholder.svg", caption: "Sample item" },
+  //   { id: "6", url: "/placeholder.svg", caption: "Example caption" },
+  // ])
  /*I need this to update with each photo taken on the previous page*/
   // State for editing captions
   const [editingCaption, setEditingCaption] = useState<string | null>(null)
 
   // Function to update photo captions
   const handleCaptionEdit = (id: string, newCaption: string) => {
-    setPhotos(photos.map((photo) => (photo.id === id ? { ...photo, caption: newCaption } : photo)))
+    console.log(newCaption);
+    setItems((prevItems) => 
+      prevItems.map((item) => 
+        item._id === id ? { ...item, itemDescription: newCaption } : item
+      )
+    );
   }
 
   // Submit photos and navigate to the main page
   const handleSubmitPhotos = () => {
-    console.log("Photos submitted:", photos)
+    console.log("Photos submitted:", items)
+
+    const updateItem = async (item: LostItem) => {
+      console.log(item);
+      const response = await fetch(`/api/lost-items/${item._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(item),
+      });
+    }
+
+    // Submit the new photo descriptions to the database
+    items.forEach((item) => {
+      // Update description respectively
+      updateItem(item);
+    })
+
     router.push("/customermainpage"); // Navigate to the main page
   }
   /* LOOK HERE TO CHANGE THE SUBMIT PHOTO NAVIGATION */
@@ -50,37 +112,24 @@ export default function Gallery() {
           <Link href="customermainpage" className="text-[#4A90E2]"> {/* LOOK HERE: LEFT ARROW Link to the previous page */}
             <ArrowLeft className="h-6 w-6" />
           </Link>
-          <h1 className="text-xl font-semibold">{photos.length} lost items</h1>
+          <h1 className="text-xl font-semibold">{items.length} lost items</h1>
         </header>
 
         {/* Scrollable Gallery */}
         <ScrollArea className="h-[600px] rounded-md border border-gray-800">
           <div className="grid grid-cols-2 gap-4 p-4">
-            {photos.map((photo) => (
-              <div key={photo.id} className="space-y-2">
+            {items.map((item) => (
+              <div key={item._id} className="space-y-2">
                 <div className="aspect-square relative rounded-lg overflow-hidden bg-black/20">
-                  <Image src={photo.url || "/placeholder.svg"} alt={photo.caption} fill className="object-cover" />
+                  <Image src={item.itemImageUrl || "/placeholder.svg"} alt={item.itemDescription} fill className="object-cover" />
                 </div>
-                {editingCaption === photo.id ? (
-                  <Input
-                    value={photo.caption}
-                    onChange={(e) => handleCaptionEdit(photo.id, e.target.value)}
-                    onBlur={() => setEditingCaption(null)}
-                    onKeyDown={(e) => e.key === "Enter" && setEditingCaption(null)}
-                    className="bg-black/20 border-gray-700"
-                    autoFocus
-                  />
-                ) : (
-                  <p
-                    className="text-sm text-gray-300 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setEditingCaption(photo.id)
-                    }}
-                  >
-                    {photo.caption}
-                  </p>
-                )}
+                {/* For when user is editing */}
+                <textarea
+                  value={item.itemDescription ? item.itemDescription.trim() : "No Description"}
+                  onChange={(e) => handleCaptionEdit(item._id, e.target.value)}
+                  rows={5} // Adjust the height with the rows attribute
+                  className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring focus:ring-blue-500"
+                />
               </div>
             ))}
           </div>
