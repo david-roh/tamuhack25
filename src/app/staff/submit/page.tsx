@@ -15,6 +15,11 @@ interface FormData {
 
 export default function SubmitLostItem() {
   const router = useRouter();
+
+  const handleBack = () => {
+    router.back(); // Navigate to the previous page
+  };
+
   const [formData, setFormData] = useState<FormData>({
     itemName: '',
     itemDescription: '',
@@ -93,7 +98,8 @@ export default function SubmitLostItem() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="px-4 py-5 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">
