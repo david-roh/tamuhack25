@@ -1,7 +1,9 @@
 'use client'
 
-import React, { ChangeEvent } from 'react';
+
 import { useState, useEffect } from 'react';
+import React, { ChangeEvent, JSX } from 'react';
+
 import Link from 'next/link';
 
 export default function FlightInputPage(): JSX.Element {
