@@ -6,6 +6,9 @@
   --background: #ffffff;
   --foreground: #171717;
   --color-primary: #3030A0;
+  --color-primary-dark: #101080;
+  --color-primary-darker: #000060;
+  --color-primary-verylight: #D0D0F0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,6 +18,7 @@
     --color-primary: #4242c6;
     --color-primary-dark: #2222A6;
     --color-primary-darker: #020286;
+    --color-primary-verylight: #D0D0F0;
   }
 }
 
@@ -48,10 +52,10 @@ body {
   color: #000;
 
   &:hover {
-    background: #CCC;
+    background: #BBB;
   }
 
   &:active {
-    background: #BBB;
+    background: #999;
   }
 }
