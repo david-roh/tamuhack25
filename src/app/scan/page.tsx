@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from 'next/link';
 
 interface VideoDevice {
   deviceId: string;
@@ -128,10 +131,6 @@ export default function ScanPage() {
     setError(error instanceof Error ? error.message : 'Scanner error occurred');
   };
 
-  const handleBackToStaffPage = () => {
-    router.push('/staff');
-  };
-
   interface IDetectedBarcode {
     rawValue: string;
   }
@@ -143,65 +142,90 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Scan Lost Item QR Code
-            </h1>
-            {cameras.length > 1 && (
-              <select
-                value={selectedCamera}
-                onChange={(e) => setSelectedCamera(e.target.value)}
-                className="block rounded-md bg-gray-200 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900"
-              >
-                {cameras.map((camera) => (
-                  <option key={camera.deviceId} value={camera.deviceId}>
-                    {camera.label}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-          
-          <div className="aspect-square w-full relative mb-4">
-            {selectedCamera && !error ? (
-              <Scanner
-                onScan={handleScanWrapper}
-                onError={handleError}
-                constraints={{
-                  deviceId: selectedCamera,
-                  facingMode: 'environment',
-                  width: { ideal: 1280 },
-                  height: { ideal: 720 }
-                }}
-                classNames="rounded-lg overflow-hidden"
-                style={{ width: '100%', height: '100%' }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
-                <p className="text-sm text-gray-500">
-                  {error || 'Initializing camera...'}
-                </p>
+    <div className="min-h-screen bg-[#1C2632] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md mx-auto">
+        <div className="mb-6">
+          <Button
+            asChild
+            variant="outline"
+            className="border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2]/5 py-2 px-3 
+              flex items-center text-lg font-normal"
+          >
+            <Link href="/staff">
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back to Staff
+            </Link>
+          </Button>
+        </div>
+
+        <div className="bg-black/20 border border-gray-800 rounded-lg shadow-lg overflow-hidden">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-bold text-white">
+                Scan Lost Item QR Code
+              </h1>
+              {cameras.length > 1 && (
+                <select
+                  value={selectedCamera}
+                  onChange={(e) => setSelectedCamera(e.target.value)}
+                  className="block rounded-lg border-gray-800 bg-black/30 
+                    shadow-sm transition duration-150 ease-in-out
+                    text-white focus:border-[#4A90E2] focus:ring-[#4A90E2] 
+                    hover:border-gray-700 sm:text-sm px-3 py-2"
+                >
+                  {cameras.map((camera) => (
+                    <option key={camera.deviceId} value={camera.deviceId}>
+                      {camera.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            
+            <div className="aspect-square w-full relative mb-4 rounded-lg overflow-hidden">
+              {selectedCamera && !error ? (
+                <Scanner
+                  onScan={handleScanWrapper}
+                  onError={handleError}
+                  constraints={{
+                    deviceId: selectedCamera,
+                    facingMode: 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                  }}
+                  style={{ 
+                    width: '100%', 
+                    height: '100%',
+                    borderRadius: '0.5rem',
+                    overflow: 'hidden'
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-black/30 rounded-lg border border-gray-800">
+                  <p className="text-sm text-gray-400">
+                    {error || 'Initializing camera...'}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {claimed && (
+              <div className="mt-4">
+                <Button
+                  asChild
+                  className="w-full bg-[#4A90E2] hover:bg-[#4A90E2]/90 text-white"
+                >
+                  <Link href="/staff">
+                    Back to Staff Page
+                  </Link>
+                </Button>
               </div>
             )}
+
+            <p className="text-sm text-gray-400 mt-4">
+              Position the QR code within the frame to scan
+            </p>
           </div>
-
-          {claimed && (
-            <div className="mt-4">
-              <button
-                onClick={handleBackToStaffPage}
-                className="w-full bg-blue-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-600"
-              >
-                Back to Staff Page
-              </button>
-            </div>
-          )}
-
-          <p className="text-sm text-gray-500 mt-4">
-            Position the QR code within the frame to scan
-          </p>
         </div>
       </div>
     </div>

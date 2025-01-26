@@ -73,6 +73,8 @@ export default function Page() {
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
     addBtn.disabled = true;
     video.pause();
+    document.querySelector(".root > .row-cam")?.classList.remove("cam-flash");
+    window.requestAnimationFrame(() => document.querySelector(".root > .row-cam")?.classList.add("cam-flash"));
 
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -235,16 +237,23 @@ export default function Page() {
             <div className="block w-14 h-8 rounded-full mic-toggle-bg"></div>
             <div className="dot absolute top-1 bg-white w-6 h-6 rounded-full"></div>
           </div>
-          <div className="ml-3 text-gray-700 font-medium">Microphone</div>
+          <div className="ml-3 text-gray-200 font-medium">Microphone</div>
         </label>
-        <div className="current-seat-num"><input type="text" value={seatNum} onChange={evt => setSeatNum(evt.target.value)} /></div>
+        <div className="current-seat-num">
+          <input
+            type="text"
+            value={seatNum}
+            onChange={evt => setSeatNum(evt.target.value)}
+            onFocus={evt => {if (evt.target.value === "\u2014") {evt.target.value = "";}}}
+            onBlur={evt => {evt.target.value = evt.target.value.trim(); if (evt.target.value === "") {evt.target.value = "\u2014";}}} />
+        </div>
       </div>
       <div className="row-btns">
         <button className="w-full rounded-lg btn btn-neutral" onClick={handleDeletePhoto}>Delete Last Photo</button>
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <button className="w-full rounded-lg btn btn-primary"><Link href={`/gallery?flightNumber=${flightNumber}`}>I'm Done</Link></button>
+        <button className="w-full rounded-lg btn donebtn"><Link href={`/gallery?flightNumber=${flightNumber}`}>I'm Done</Link></button>
       </div>
     </div>
   );
