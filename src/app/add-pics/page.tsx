@@ -199,7 +199,7 @@ export default function Page() {
           </div>
           <div className="ml-3 text-gray-700 font-medium">Microphone</div>
         </label>
-        <div className="current-seat-num">{seatNum}</div>
+        <div className="current-seat-num"><input type="text" value={seatNum} onChange={evt => setSeatNum(evt.target.value)} /></div>
       </div>
       <div className="row-btns">
         <button className="w-full rounded-lg btn btn-neutral">Delete Last Photo</button>
