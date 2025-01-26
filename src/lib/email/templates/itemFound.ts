@@ -79,6 +79,22 @@ export function itemFoundTemplate(data: EmailTemplateData) {
           h3 { color: #0078D2; font-size: 1.1em; margin: 0 0 16px 0; }
           p { color: #475569; line-height: 1.5; margin: 8px 0; }
           .divider { border-top: 1px solid #e2e8f0; margin: 24px 0; }
+          .item-image-container {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+            text-align: center;
+          }
+          
+          .item-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 0 auto;
+            display: block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
         </style>
       </head>
       <body>
@@ -94,6 +110,18 @@ export function itemFoundTemplate(data: EmailTemplateData) {
 
           <div class="content">
             <p style="font-size: 1.1em;">${data.message}</p>
+            
+            <div class="item-image-container">
+              <h2 style="margin-top: 0;">Your Lost Item</h2>
+              ${data.lostItem.itemImageUrl ? `
+                <img 
+                  src="${data.lostItem.itemImageUrl}"
+                  alt="${data.lostItem.itemName || 'Lost Item'}"
+                  class="item-image"
+                  style="max-width: 400px; width: 100%;"
+                />
+              ` : ''}
+            </div>
             
             <div class="flight-info">
               <h2 style="margin-top: 0;">Item Details</h2>
@@ -168,6 +196,7 @@ interface EmailTemplateData {
     claimToken: string;
     collectionCode: string;
     qrCodeUrl: string;
+    itemImageUrl?: string;
   };
   flight: {
     flightNumber: string;
