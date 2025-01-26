@@ -208,19 +208,19 @@ export default function Page() {
 
   return (
     
-    <div className="root">
-    <AnimatePresence>
-        {showPopup && (
-          <motion.div
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -50, opacity: 0 }}
-            className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg mt-4"
-          >
-            Item has been deleted successfully.
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="root bg-green-500 text-white">
+      <AnimatePresence>
+          {showPopup && (
+            <motion.div
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg mt-4"
+            >
+              Item has been deleted successfully.
+            </motion.div>
+          )}
+        </AnimatePresence>
       <div className="row-header">
         <a href="/flightAttendant" className="btn btn-neutral">&#x2B05; Back</a>
         <h1 className="text-2xl font-bold text-center">{flightNumber}</h1>
