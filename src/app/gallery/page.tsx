@@ -39,7 +39,7 @@ export default function Gallery() {
   // Submit photos and navigate to the main page
   const handleSubmitPhotos = () => {
     console.log("Photos submitted:", photos)
-    router.push("/mainpage"); // Navigate to the main page
+    router.push("/customermainpage"); // Navigate to the main page
   }
   /* LOOK HERE TO CHANGE THE SUBMIT PHOTO NAVIGATION */
 
@@ -47,7 +47,7 @@ export default function Gallery() {
     <div className="min-h-screen bg-[#1C2632] text-white">
       <div className="p-4">
         <header className="flex items-center gap-4 mb-6">
-          <Link href="/mainpage" className="text-[#4A90E2]"> {/* LOOK HERE: LEFT ARROW Link to the previous page */}
+          <Link href="customermainpage" className="text-[#4A90E2]"> {/* LOOK HERE: LEFT ARROW Link to the previous page */}
             <ArrowLeft className="h-6 w-6" />
           </Link>
           <h1 className="text-xl font-semibold">{photos.length} lost items</h1>

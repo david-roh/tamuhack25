@@ -1,11 +1,24 @@
+"use client"
+
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { Button } from "../../components/ui/button";
+import { useRouter } from "next/navigation";
+
+
+
 
 export default function LostItems() {
+
+  const router = useRouter(); // Initialize router
+
+  const handleSubmitForm = () => {
+    router.push("/customermainpage"); // Navigate to the main page //CHANGE WHERE IT SUBMITS TO
+  }
   return (
     <div className="min-h-screen bg-[#1C2632] text-white p-4">
       <header className="flex items-center gap-4 mb-6">
-        <Link href="/mainpage" className="text-[#4A90E2]">
+        <Link href="/customermainpage" className="text-[#4A90E2]">
           {" "}
           <ArrowLeft className="h-6 w-6" />
         </Link>
@@ -53,13 +66,12 @@ export default function LostItems() {
             {/* Put id=description in DB */}
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-[#4A90E2] text-white py-3 px-4 rounded font-medium hover:bg-[#357ABD] transition-colors"
-          >
-{/* Need to link to something else? maybe like a confirmation and then show in the DB*/}
-            Submit Report
-          </button>
+        {/* Submit Photos Button */}
+        <Button onClick={handleSubmitForm} className="w-full mt-4 bg-[#4A90E2] hover:bg-[#4A90E2]/90">
+          Submit Form
+        </Button>
+          
+          {/* Need to link to something else? maybe like a confirmation and then show in the DB*/}
         </form>
       </div>
     </div>
