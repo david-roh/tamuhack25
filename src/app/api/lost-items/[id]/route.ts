@@ -59,10 +59,10 @@ export async function PATCH(
       partialLostItemSchema
     );
     if (!validation.success) { // make sure items have names and follow schema guidelines defined by partialLostItemSchema
-      // console.log("No Validation")
-      // console.log(validation.error)
-      // console.log(updateData);
-      // console.log("--------------------------------------------------------------------------------------------------------")
+      console.log("No Validation")
+      console.log(validation.error)
+      console.log(updateData);
+      console.log("--------------------------------------------------------------------------------------------------------")
       return validation.error;
     }
 
