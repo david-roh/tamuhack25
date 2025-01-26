@@ -26,7 +26,7 @@ export async function analyzeImage(imageBase64: string): Promise<ImageAnalysis> 
         content: [
           {
             type: 'text',
-            text: 'Analyze the image and provide details in JSON format, including itemName, itemDescription, condition, category, and optional fields like color, brand, and size.',
+            text: 'Analyze the image of a lost item found on a plane and provide details in JSON format, including itemName, itemDescription, condition, category (e.g., electronics, clothing, personal items), and optional fields like color, brand, and size.',
           },
           {
             type: 'image_url',
@@ -38,7 +38,7 @@ export async function analyzeImage(imageBase64: string): Promise<ImageAnalysis> 
       },
     ],
     model: 'llama-3.2-90b-vision-preview',
-    temperature: 0.3,
+    temperature: 0.1,
     max_tokens: 500,
     response_format: { type: 'json_object' },
   });
@@ -88,4 +88,40 @@ export async function extractItemDetails(text: string): Promise<Partial<ImageAna
 
   const result = imageAnalysisSchema.partial().parse(JSON.parse(completion.choices[0]?.message?.content || '{}'));
   return result;
+}
+
+// Schema for image title
+const imageTitleSchema = z.object({
+  title: z.string(),
+});
+
+export type ImageTitle = z.infer<typeof imageTitleSchema>;
+
+export async function generateImageTitle(imageBase64: string): Promise<string> {
+  const completion = await groq.chat.completions.create({
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Generate a concise but descriptive title (3-5 words) for this item. Note this is a title for a lost item, so it should be concise and descriptive. Respond in JSON format with a single "title" field.',
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/jpeg;base64,${imageBase64}`,
+            },
+          },
+        ],
+      },
+    ],
+    model: 'llama-3.2-90b-vision-preview',
+    temperature: 0.1,
+    max_tokens: 100,
+    response_format: { type: 'json_object' },
+  });
+
+  const result = imageTitleSchema.parse(JSON.parse(completion.choices[0]?.message?.content || '{}'));
+  return result.title;
 }

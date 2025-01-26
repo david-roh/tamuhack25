@@ -6,7 +6,7 @@ import LostItem from '@/models/LostItem';
 import Notification from '@/models/Notification';
 import { generateQRCode } from '@/lib/qrcode';
 import { lostItemSchema } from '@/lib/validations/schemas';
-import { analyzeImage } from '@/lib/groq';
+import { analyzeImage, generateImageTitle } from '@/lib/groq';
 import { uploadImage } from '@/lib/cloudinary';
 import { sendEmail } from '@/lib/email/sendEmail';
 import { generateToken } from '@/lib/token';
@@ -96,8 +96,14 @@ export async function POST(req: Request) {
       const imageUrl = await uploadImage(base64Image);
       itemData.itemImageUrl = imageUrl;
 
-      // Analyze the image using Groq
       try {
+        // Generate a title if one wasn't provided
+        if (!itemName) {
+          const generatedTitle = await generateImageTitle(base64Image);
+          itemData.itemName = generatedTitle;
+        }
+
+        // Get full analysis for description
         const imageAnalysis = await analyzeImage(base64Image);
         itemData.itemDescription = `${itemData.itemDescription}\n\nAI Analysis:\n${imageAnalysis.itemDescription}\nCondition: ${imageAnalysis.condition}\nCategory: ${imageAnalysis.category}${imageAnalysis.brand ? '\nBrand: ' + imageAnalysis.brand : ''}${imageAnalysis.color ? '\nColor: ' + imageAnalysis.color : ''}${imageAnalysis.size ? '\nSize: ' + imageAnalysis.size : ''}`;
       } catch (error) {
