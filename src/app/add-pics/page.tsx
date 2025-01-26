@@ -166,7 +166,7 @@ export default function Page() {
     const video = document.getElementById("cam-viewfinder") as HTMLVideoElement;
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       .then(stream => {
         video.srcObject = stream;
         video.onloadedmetadata = () => {
