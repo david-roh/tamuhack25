@@ -18,13 +18,10 @@ export async function GET(
 ) {
   try {
     await dbConnect();
-    const { token } = await params;
-
-    // Add rate limiting here if needed
+    const { token } = params;
 
     const lostItem = await LostItem.findOne({ 
-      claimToken: token,
-      status: { $ne: 'shipped' } // Don't show shipped items
+      claimToken: token
     })
       .populate({
         path: 'flight',
@@ -35,13 +32,26 @@ export async function GET(
         path: 'seat',
         model: Seat,
         select: 'seatNumber'
-      });
+      })
+      .lean(); // Add lean() to convert to plain object
 
     if (!lostItem) {
       return NextResponse.json(
-        { error: 'Item not found or no longer available' },
+        { error: 'Item not found' },
         { status: 404 }
       );
+    }
+
+    // Transform shippingDetails to match the frontend interface
+    if (lostItem.status === 'shipped' && lostItem.shippingDetails) {
+      lostItem.shipping = {
+        address: lostItem.shippingDetails.address,
+        city: lostItem.shippingDetails.city,
+        state: lostItem.shippingDetails.state,
+        postalCode: lostItem.shippingDetails.postalCode,
+        country: lostItem.shippingDetails.country,
+        trackingNumber: lostItem.shippingDetails.trackingNumber
+      };
     }
 
     // Add audit log

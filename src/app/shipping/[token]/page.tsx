@@ -70,29 +70,48 @@ export default function ShippingPage() {
   // Check item status on page load
   useEffect(() => {
     async function checkItemStatus() {
+      console.log('Checking item status for token:', params.token);
       try {
         const response = await fetch(`/api/lost-items/${params.token}`);
+        console.log('Response status:', response.status);
         const data = await response.json();
+        console.log('Item data:', data);
 
         if (!response.ok) {
+          console.error('Response not OK:', data.error);
           throw new Error(data.error || 'Failed to fetch item status');
         }
 
-        // Check if item is already claimed or shipped
-        if (data.status === 'claimed') {
+        // Check if item exists and has status
+        if (!data.item || !data.item.status) {
+          console.error('Invalid item data:', data);
+          toast.error('Invalid item token');
+          router.push('/staff');
+          return;
+        }
+
+        // Log the item status
+        console.log('Item status:', data.item.status);
+
+        // Only redirect for specific statuses
+        if (data.item.status === 'claimed') {
+          console.log('Item is already claimed, redirecting...');
           toast.error('This item has already been claimed');
           router.push('/staff');
           return;
         }
 
-        if (data.status === 'shipped') {
+        if (data.item.status === 'shipped') {
+          console.log('Item is already shipped, redirecting...');
           toast.error('This item has already been shipped');
           router.push('/staff');
           return;
         }
 
+        console.log('Item is valid and available for shipping');
         setLoading(false);
       } catch (err: any) {
+        console.error('Error checking item status:', err);
         toast.error(err.message || 'Failed to check item status');
         router.push('/staff');
       }
@@ -131,7 +150,7 @@ export default function ShippingPage() {
 
       toast.success('Shipping request processed successfully!');
       router.push('/shipping/confirmation');
-    } catch (err: any) {
+    } catch (err: Error) {
       toast.error(err.message || 'Failed to process shipping');
       setError(err.message || 'Failed to process shipping');
     } finally {
