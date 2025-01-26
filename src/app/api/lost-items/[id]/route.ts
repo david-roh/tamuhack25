@@ -10,13 +10,15 @@ import Seat from '@/models/Seat';
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    console.log('Fetching item with id:', params.id);
+    const { id } = await params;
+    console.log('Fetching item with id/token:', id);
 
-    const lostItem = await LostItem.findById(params.id)
+    // Try to find by claim token first
+    let lostItem = await LostItem.findOne({ claimToken: id })
       .populate({
         path: 'flight',
         model: Flight,
@@ -29,6 +31,22 @@ export async function GET(
       })
       .lean();
 
+    // If not found by token and id is valid ObjectId, try finding by _id
+    if (!lostItem && mongoose.isValidObjectId(id)) {
+      lostItem = await LostItem.findById(id)
+        .populate({
+          path: 'flight',
+          model: Flight,
+          select: 'flightNumber originCode destinationCode departureTime arrivalTime'
+        })
+        .populate({
+          path: 'seat',
+          model: Seat,
+          select: 'seatNumber customerEmail'
+        })
+        .lean();
+    }
+
     if (!lostItem) {
       console.log('Item not found');
       return NextResponse.json(
@@ -38,8 +56,7 @@ export async function GET(
     }
 
     console.log('Found item:', lostItem);
-
-    return NextResponse.json(lostItem);
+    return NextResponse.json({ item: lostItem });
   } catch (error) {
     console.error('Error fetching lost item:', error);
     return NextResponse.json(
