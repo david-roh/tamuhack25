@@ -18,7 +18,8 @@ export async function GET(
 ) {
   try {
     await dbConnect();
-    const { token } = params;
+    // Await params before destructuring
+    const token = (await params).token;
 
     const lostItem = await LostItem.findOne({ 
       claimToken: token
@@ -79,7 +80,8 @@ export async function POST(
 ) {
   try {
     await dbConnect();
-    const { token } = await params;
+    // Await params before destructuring
+    const token = (await params).token;
     
     // Validate request body
     const body = await req.json();
