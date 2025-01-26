@@ -213,7 +213,7 @@ export default function Page() {
         <button className="w-full rounded-lg btn btn-primary" onClick={handleAddPhoto}>Add Photo</button>
       </div>
       <div className="row-done">
-        <button className="w-full rounded-lg btn btn-primary"><Link href={`/gallery?flightNumber=${flightNumber}`}>I'm Done</Link></button>
+        <button className="w-full rounded-lg btn donebtn"><Link href={`/gallery?flightNumber=${flightNumber}`}>I'm Done</Link></button>
       </div>
     </div>
   );
