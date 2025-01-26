@@ -182,7 +182,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="root">
+    <div className="root" style={{ background: "#f2f4fd" }}>
       <div className="row-header">
         <a href="/flightAttendant" className="btn btn-neutral">&#x2B05; Back</a>
         <h1 className="text-2xl font-bold text-center">{flightNumber}</h1>

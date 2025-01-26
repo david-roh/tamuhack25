@@ -5,8 +5,8 @@
   padding: 10px;
   flex: 1;
   height: 100vh;
-  background: #FFF;
-  color: #000;
+  background: #1C2632; /* Changed background to #1C2632 */
+  color: #FFF; /* Changed text color to white for better contrast */
 }
 
 .root > * {
@@ -14,7 +14,7 @@
   flex-direction: row;
   gap: 10px;
   height: 50px;
-  background: #EEE;
+  background: #2A2D32; /* Adjusted background for child elements for better contrast */
   border-radius: 0.5rem;
 
   & > * {
@@ -40,6 +40,7 @@
 
   & > h1 {
     flex-grow: 1;
+    color: #FFF; /* Ensured header text is visible */
   }
 }
 
@@ -68,20 +69,20 @@
 
 .mic-toggle-label .mic-toggle-bg {
   background: rgb(75 85 99);
-  transition: background 200ms;
+  transition: all 300ms;
 }
 
 .mic-toggle-label:has(#mic-toggle:checked) .mic-toggle-bg {
   background: var(--color-primary);
 }
 
-.mic-toggle-label .dot {
-  left: 0.25rem;
-  transition: left 200ms;
+.mic-toggle-label:has(#mic-toggle:checked) .dot {
+  transform: translateX(12rem);
 }
 
-.mic-toggle-label:has(#mic-toggle:checked) .dot {
-  left: 1.75rem;
+.mic-toggle-label .dot {
+  transition: transform 300ms;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .current-seat-num {
