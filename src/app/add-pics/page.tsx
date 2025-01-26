@@ -239,7 +239,14 @@ export default function Page() {
           </div>
           <div className="ml-3 text-gray-200 font-medium">Microphone</div>
         </label>
-        <div className="current-seat-num"><input type="text" value={seatNum} onChange={evt => setSeatNum(evt.target.value)} /></div>
+        <div className="current-seat-num">
+          <input
+            type="text"
+            value={seatNum}
+            onChange={evt => setSeatNum(evt.target.value)}
+            onFocus={evt => {if (evt.target.value === "\u2014") {evt.target.value = "";}}}
+            onBlur={evt => {evt.target.value = evt.target.value.trim(); if (evt.target.value === "") {evt.target.value = "\u2014";}}} />
+        </div>
       </div>
       <div className="row-btns">
         <button className="w-full rounded-lg btn btn-neutral" onClick={handleDeletePhoto}>Delete Last Photo</button>
