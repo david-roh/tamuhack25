@@ -3,8 +3,18 @@ import { itemFoundTemplate } from './templates/itemFound';
 
 interface EmailData {
   email: string;
-  lostItem: any;
-  flight: any;
+  lostItem: {
+    itemName: string;
+    itemDescription: string;
+    claimToken: string;
+    collectionCode: string;
+    qrCodeUrl: string;
+  };
+  flight: {
+    flightNumber: string;
+    originCode: string;
+    destinationCode: string;
+  };
   message: string;
   options?: {
     collect?: {
@@ -26,7 +36,7 @@ export async function sendEmail(template: 'item-found', data: EmailData) {
 
     const response = await resend.emails.send({
       from,
-      reply_to: replyTo,
+      replyTo,
       to: data.email,
       subject: `Lost Item Found - ${data.lostItem.itemName}`,
       html: emailContent,
