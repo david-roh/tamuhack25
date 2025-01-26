@@ -34,9 +34,9 @@ export async function PATCH(
 ) {
   try {
     await dbConnect();
-    console.log("Hit this patch endpoint")
+    // console.log("Hit this patch endpoint")
     const body = await req.json();
-    console.log("Body", body)
+    // console.log("Body", body)
     let updateData = { ...body };
 
 
@@ -59,14 +59,14 @@ export async function PATCH(
       partialLostItemSchema
     );
     if (!validation.success) { // make sure items have names and follow schema guidelines defined by partialLostItemSchema
-      console.log("No Validation")
-      console.log(validation.error)
-      console.log(updateData);
-      console.log("--------------------------------------------------------------------------------------------------------")
+      // console.log("No Validation")
+      // console.log(validation.error)
+      // console.log(updateData);
+      // console.log("--------------------------------------------------------------------------------------------------------")
       return validation.error;
     }
 
-    console.log(body);
+    // console.log(body);
 
     const item = await LostItem.findByIdAndUpdate(
       body._id,
@@ -81,10 +81,10 @@ export async function PATCH(
       );
     }
 
-    console.log("JSON WORKED ------------------")
+    // console.log("JSON WORKED ------------------")
     return NextResponse.json(item);
   } catch (error: any) {
-    console.log("JSON DIDN'T WORK ---------------------------")
+    // console.log("JSON DIDN'T WORK ---------------------------")
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

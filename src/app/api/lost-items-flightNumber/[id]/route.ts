@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params // doesn't actually do anything but get rid of error
-    console.log("Hit endpoint for lost-items-flightNumber: ", id)
+    // console.log("Hit endpoint for lost-items-flightNumber: ", id)
     await dbConnect();
     // const items = await LostItem.find({ flight: id })
     // Find the Flight document
@@ -18,7 +18,7 @@ export async function GET(
     }
 
     // Query LostItem with the Flight _id
-    const items = await LostItem.find({ flight: flight._id }).populate('flight');
+    const items = await LostItem.find({ flight: flight._id });
 
     // const filteredItems = items.filter(item => item.flight !== null); // Filter out null results
     // const items = await LostItem.find({ flight: id }).populate('flight')

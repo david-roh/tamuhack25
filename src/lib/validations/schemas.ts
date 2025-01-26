@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Flight validation schemas
 const flightSchema = z.object({
-  flightNumber: z.string().min(2).max(10),
+  flightNumber: z.string().min(0).max(10),
   originCode: z.string().length(3).toUpperCase(),
   destinationCode: z.string().length(3).toUpperCase(),
   departureTime: z.string().datetime(),

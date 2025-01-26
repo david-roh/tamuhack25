@@ -42,7 +42,7 @@ export default function Gallery() {
       const fetchItems = async () => {
           const params = new URLSearchParams(window.location.search); 
           const fNum = params.get("flightNumber");
-          console.log("Params flightNumber: ", fNum);
+          // console.log("Params flightNumber: ", fNum);
           const res = await fetch(`/api/lost-items-flightNumber/${fNum}`);
   
           if (!res.ok) {
@@ -72,7 +72,7 @@ export default function Gallery() {
 
   // Function to update photo captions
   const handleCaptionEdit = (id: string, newCaption: string) => {
-    console.log(newCaption);
+    // console.log(newCaption);
     setItems((prevItems) => 
       prevItems.map((item) => 
         item._id === id ? { ...item, itemDescription: newCaption } : item
@@ -82,10 +82,10 @@ export default function Gallery() {
 
   // Submit photos and navigate to the main page
   const handleSubmitPhotos = () => {
-    console.log("Photos submitted:", items)
+    // console.log("Photos submitted:", items)
 
     const updateItem = async (item: LostItem) => {
-      console.log(item);
+      // console.log(item);
       const response = await fetch(`/api/lost-items/${item._id}`, {
         method: 'PATCH',
         headers: {
